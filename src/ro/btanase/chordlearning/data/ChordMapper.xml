@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ro.btanase.chordlearning.data.ChordMapper">
+	<select id="selectAll" resultType="ro.btanase.chordlearning.domain.Chord">
+		SELECT 
+			C_ID AS id,
+			C_NAME AS chordName,
+			C_FILENAME AS fileName
+		FROM chord
+	</select>
+
+	<select id="selectById" resultType="ro.btanase.chordlearning.domain.Chord" parameterType="int">
+		SELECT 
+			C_ID AS id,
+			C_NAME AS chordName,
+			C_FILENAME AS fileName
+		FROM chord
+		WHERE
+			C_ID = #{id}
+	</select>
+	
+	<insert id="insert" parameterType="ro.btanase.chordlearning.domain.Chord"
+			keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO chord
+			(C_NAME, C_FILENAME)
+		VALUES
+			(#{chordName}, #{fileName})	
+	</insert>
+	
+	<select id="lastInsertId" resultType="int">
+		CALL IDENTITY()
+	</select>
+	
+	<update id="update" parameterType="ro.btanase.chordlearning.domain.Chord">
+		UPDATE chord 
+		SET 
+			C_NAME = #{chordName},
+			C_FILENAME = #{fileName}
+		WHERE
+			C_ID = #{id}
+	</update>
+	<delete id="delete" parameterType="int">
+		DELETE FROM chord
+		WHERE C_ID = #{id}
+	</delete>
+</mapper>

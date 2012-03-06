@@ -1,0 +1,10 @@
+.settings
+bin
+export
+preset_data
+test
+.classpath
+.project
+miglayout-src.zip
+miglayout15-swing.jar
+sqlstatements.sql
