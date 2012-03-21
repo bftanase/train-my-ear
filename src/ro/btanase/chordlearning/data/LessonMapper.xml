@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ro.btanase.chordlearning.data.LessonMapper">
+	<select id="selectAll" resultType="ro.btanase.chordlearning.domain.Lesson">
+		SELECT 
+			L_ID AS id,
+			L_NAME AS lessonName,
+			L_NO_QUESTIONS AS noQuestions,
+			L_TYPE AS type,
+			L_NO_CHORDS AS noChordsInSequence,
+			L_CHORD_DELAY AS chordDelay
+		FROM lesson
+	</select>
+
+	<select id="selectById" resultType="ro.btanase.chordlearning.domain.Lesson" parameterType="int">
+		SELECT 
+			L_ID AS id,
+			L_NAME AS lessonName,
+			L_NO_QUESTIONS AS noQuestions,
+			L_TYPE AS type,
+			L_NO_CHORDS AS noChordsInSequence,
+			L_CHORD_DELAY AS chordDelay
+		FROM lesson
+		WHERE
+			L_ID = #{id}
+	</select>
+
+	<select id="selectChordsByLessonId" resultType="ro.btanase.chordlearning.domain.Chord" parameterType="int">
+			SELECT 
+			  CHORD.C_ID AS id, 
+			  CHORD.C_NAME AS chordName, 
+			  CHORD.C_FILENAME AS fileName 
+			FROM
+			  LESSON_CHORD 
+			  JOIN CHORD 
+			    ON LESSON_CHORD.C_ID = CHORD.C_ID 
+			WHERE L_ID = #{lessonId}
+	</select>
+ 	
+	<insert id="insert" parameterType="ro.btanase.chordlearning.domain.Lesson"
+						keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO lesson
+			(
+				L_NAME,
+				L_NO_QUESTIONS,
+				L_TYPE,
+				L_NO_CHORDS,
+				L_CHORD_DELAY	
+			)
+		VALUES
+			(
+				#{lessonName},
+				#{noQuestions},
+				#{type},
+				#{noChordsInSequence},
+				#{chordDelay}
+			)	
+	</insert>
+
+	<insert id="insertChordToLesson" parameterType="map">
+		INSERT INTO
+			LESSON_CHORD
+				(C_ID, L_ID)
+		 	VALUES 
+		 		(#{chordId}, #{lessonId} )
+	</insert>
+	
+
+	<select id="lastInsertId" resultType="int">
+		CALL IDENTITY()
+	</select>
+
+
+
+	<update id="update" parameterType="ro.btanase.chordlearning.domain.Lesson">
+		UPDATE lesson 
+		SET 
+			L_NAME = #{lessonName},
+			L_NO_QUESTIONS = #{noQuestions},
+			L_TYPE = #{type},
+			L_NO_CHORDS = #{noChordsInSequence},
+			L_CHORD_DELAY = #{chordDelay}
+		WHERE
+			L_ID = #{id}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		DELETE FROM lesson
+		WHERE L_ID = #{id}
+	</delete>
+
+	<delete id="deleteLessonChords" parameterType="int">
+		DELETE FROM LESSON_CHORD
+		WHERE L_ID = #{lessonId}
+	</delete>
+
+</mapper>

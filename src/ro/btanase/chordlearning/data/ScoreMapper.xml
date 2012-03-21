@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ro.btanase.chordlearning.data.ScoreMapper">
+	<select id="selectScoreById" parameterType="int" resultMap="scoreResultMap">
+		SELECT 
+		  S_ID AS score_id,
+		  S_DATE AS score_date,
+		  LESSON.L_ID AS lesson_id,
+		  L_NAME AS lessonName,
+		  L_NO_QUESTIONS AS noQuestions,
+		  L_TYPE AS TYPE,
+		  L_NO_CHORDS AS noChordsInSequence,
+		  L_CHORD_DELAY AS chordDelay,
+		  CORRECT as  correct,
+		  ES_ID as es_id,
+		  CHORD.C_ID as chord_id,
+		  C_NAME as chordName,
+		  C_FILENAME as chordFilename
+		FROM
+		  "PUBLIC"."SCORE" 
+		  JOIN EXERCISE_SCORE 
+		    ON SCORE.S_ID = EXERCISE_SCORE.S_ID 
+		  JOIN CHORD 
+		    ON EXERCISE_SCORE.C_ID = CHORD.C_ID 
+		  JOIN LESSON 
+		    ON SCORE.L_ID = LESSON.L_ID 
+		WHERE S_ID = #{id}
+	</select>
+
+<!--  
+	These result maps are used when building the object tree for Score. 
+	Refer to MyBatis documentation for details 
+-->	
+	<resultMap type="ro.btanase.chordlearning.domain.Score" id="scoreResultMap">
+		<id property="id" column="score_id"/>
+		<result property="date" column="score_date"/>
+		<association property="lesson" column="lesson_id" 
+								 javaType="ro.btanase.chordlearning.domain.Lesson"
+								 resultMap="lessonResultMap"/>
+		<collection property="lessonResults" ofType="ExerciseResult">
+			<id property="id" column="es_id" />
+			<result property="correct" column="correct"/>
+			<association property="chord" column="chord_id" javaType="Chord">
+				<id property="id" column="chord_id" />
+				<result property="chordName" column="chordName"/>
+				<result property="fileName" column="chordFilename"/>
+			</association>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="ro.btanase.chordlearning.domain.Lesson" id="lessonResultMap">
+		<id property="id" column="lesson_id"/>
+		<result property="lessonName" column="lessonName"/>
+		<result property="noQuestions" column="noQuestions"/>
+		<result property="type" column="type"/>
+		<result property="noChordsInSequence" column="noChordsInSequence"/>
+		<result property="chordDelay" column="chordDelay"/>
+	</resultMap>
+
+
+	<select id="selectChordAccuracy" resultType="ChordAccuracyWrapper">
+		SELECT 
+		  c_name as chordName,
+		  (SELECT 
+		    COUNT(*) 
+		  FROM
+		    exercise_score es 
+		  WHERE es.c_id = exercise_score.c_id 
+		    AND es.correct = TRUE) AS correctCount,
+		  COUNT(correct) AS totalCount 
+		FROM
+		  exercise_score 
+		  JOIN chord 
+		    ON exercise_score.C_ID = chord.C_ID 
+		GROUP BY c_id,
+		  c_name 	
+  </select>
+
+	<select id="selectLessonAccuracyEvolution" parameterType="int" resultType="LessonEvolutionWrapper">
+		SELECT 
+		  lesson.l_name as lessonName,
+		  s_date as scoreDate,
+		  (SELECT 
+		    COUNT(correct) 
+		  FROM
+		    exercise_score 
+		  WHERE exercise_score.s_id = score.s_id 
+		    AND correct = TRUE) AS correctCount,
+		  (SELECT 
+		    COUNT(correct) 
+		  FROM
+		    exercise_score 
+		  WHERE exercise_score.s_id = score.s_id) AS totalCount 
+		FROM
+		  score 
+		  JOIN lesson 
+		    ON score.l_id = lesson.l_id 
+		WHERE l_id = #{id}  
+	</select>
+
+ 	<insert id="insertScore" 
+ 		parameterType="ro.btanase.chordlearning.domain.Score"
+ 		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO SCORE
+			(S_DATE, L_ID) 
+		VALUES
+		  (#{date}, #{lesson.id})	
+  </insert>
+
+ 	<insert id="insertExerciseResult" parameterType="map">
+		INSERT INTO EXERCISE_SCORE
+			(C_ID, S_ID, CORRECT)
+		VALUES (#{chordId}, #{scoreId}, #{correct})  
+	</insert>
+	
+ 
+	<select id="lastInsertId" resultType="int">
+		CALL IDENTITY()
+	</select>
+
+	<delete id="deleteAllScores">
+		DELETE FROM score
+	</delete>
+	
+<!--
+
+
+	<update id="update" parameterType="ro.btanase.chordlearning.domain.Lesson">
+		UPDATE lesson 
+		SET 
+			L_NAME = #{lessonName},
+			L_NO_QUESTIONS = #{noQuestions},
+			L_TYPE = #{type},
+			L_NO_CHORDS = #{noChordsInSequence},
+			L_CHORD_DELAY = #{chordDelay}
+		WHERE
+			L_ID = #{id}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		DELETE FROM lesson
+		WHERE L_ID = #{id}
+	</delete>
+
+	<delete id="deleteLessonChords" parameterType="int">
+		DELETE FROM LESSON_CHORD
+		WHERE L_ID = #{lessonId}
+	</delete>
+ -->
+</mapper>

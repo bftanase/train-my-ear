@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration 
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias alias="Score" type="ro.btanase.chordlearning.domain.Score" />
+		<typeAlias alias="Lesson" type="ro.btanase.chordlearning.domain.Lesson" />
+		<typeAlias alias="Chord" type="ro.btanase.chordlearning.domain.Chord" />
+		<typeAlias alias="ExerciseResult" type="ro.btanase.chordlearning.domain.ExerciseResult" />
+		<typeAlias alias="ChordAccuracyWrapper" type="ro.btanase.chordlearning.domain.wrappers.ChordAccuracyWrapper" />
+		<typeAlias alias="LessonEvolutionWrapper" type="ro.btanase.chordlearning.domain.wrappers.LessonEvolutionWrapper" />
+	</typeAliases>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+		 		<property name="driver" value="org.hsqldb.jdbc.JDBCDriver"/> 
+				<property name="url" value="${url}"/>
+				<property name="username" value="${user}"/>
+				<property name="password" value="${pass}"/>
+			</dataSource>
+		</environment>
+	</environments>
+
+
+	<mappers>
+		<mapper resource="ro/btanase/chordlearning/data/ChordMapper.xml"/>
+		<mapper resource="ro/btanase/chordlearning/data/LessonMapper.xml"/>
+		<mapper resource="ro/btanase/chordlearning/data/ScoreMapper.xml"/>
+	</mappers>
+	
+
+</configuration>

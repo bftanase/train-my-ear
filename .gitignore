@@ -1,0 +1,9 @@
+bin
+test
+export
+preset_data
+.settings
+.classpath
+.project
+miglayout-src.zip
+miglayout15-swing.jar
