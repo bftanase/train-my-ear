@@ -52,4 +52,3 @@ public interface UserData {
    * Examines the DB Schema and upgrades it if necessary to the latest version
    */
   public void upgradeIfNecessary();
-}

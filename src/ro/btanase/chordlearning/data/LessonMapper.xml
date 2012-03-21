@@ -96,4 +96,5 @@
 		WHERE L_ID = #{lessonId}
 	</delete>
 
+
 </mapper>

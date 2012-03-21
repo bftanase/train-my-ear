@@ -6,4 +6,3 @@ public interface JdbcService {
 
   public abstract Connection getCon();
 
-}
