@@ -6,18 +6,12 @@ import java.util.Comparator;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
 import net.miginfocom.swing.MigLayout;
-import ro.btanase.chordlearning.dao.ScoreDao;
-import ro.btanase.chordlearning.domain.ChordAccuracy;
-import ro.btanase.chordlearning.domain.wrappers.ChordAccuracyWrapper;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.swing.EventTableModel;
-
-import com.google.inject.Inject;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -25,10 +19,13 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.Dataset;
 
-import javax.swing.JSplitPane;
-import javax.swing.JPanel;
+import ro.btanase.chordlearning.dao.ScoreDao;
+import ro.btanase.chordlearning.domain.wrappers.ChordAccuracyWrapper;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.swing.EventTableModel;
+
+import com.google.inject.Inject;
 
 public class ChordAccuracyFrame extends JDialog {
   private JTable jtableScore;

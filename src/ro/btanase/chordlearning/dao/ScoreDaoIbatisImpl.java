@@ -1,11 +1,5 @@
 package ro.btanase.chordlearning.dao;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,22 +7,19 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import ro.btanase.chordlearning.data.ScoreMapper;
-import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.ChordAccuracy;
 import ro.btanase.chordlearning.domain.ExerciseResult;
 import ro.btanase.chordlearning.domain.Lesson;
 import ro.btanase.chordlearning.domain.Score;
 import ro.btanase.chordlearning.domain.wrappers.ChordAccuracyWrapper;
 import ro.btanase.chordlearning.domain.wrappers.LessonEvolutionWrapper;
-import ro.btanase.chordlearning.services.JdbcService;
 import ro.btanase.chordlearning.services.SessionFactory;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class ScoreDaoIbatisImpl implements ScoreDao {

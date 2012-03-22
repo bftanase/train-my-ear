@@ -2,7 +2,6 @@ package ro.btanase.mediaplayer;
 
 import imaadpcm.ImaAdpcm;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,8 +12,6 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 
 import org.apache.log4j.Logger;
@@ -196,97 +193,12 @@ public class SequencePlayer {
 
     player.setPlayList(playList);
 
-    // player.play();
-    // Thread.sleep(1500);
-    // player.play();
-    // player.play();
-
     System.in.read();
   }
 
-  // private void playIma(String filename, float gain) throws IOException,
-  // LineUnavailableException{
-  // AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-  // 44100, 16, 2, (16 / 8) * 2, 44100, false);
-  // // ImaAdpcm ima = new ImaAdpcm();
-  //
-  // File file = new File(filename);
-  //
-  // if (!file.exists()){
-  // throw new IllegalStateException("File does not exists");
-  // }
-  //
-  // ByteOutputStream bos = new ByteOutputStream();
-  //
-  // final int BUF_SAMPLES = 16384;
-  //
-  // int count = (int) file.length();
-  // ImaAdpcm imaAdpcm = new ImaAdpcm();
-  // byte[] buffer = new byte[BUF_SAMPLES * 4];
-  // FileInputStream input = new FileInputStream(file);
-  // while (count > 0) {
-  // int samples = count > BUF_SAMPLES ? BUF_SAMPLES : count;
-  // imaAdpcm.decode(input, buffer, samples);
-  // bos.write(buffer);
-  // count -= samples;
-  // }
-  //
-  // ByteInputStream bis = new ByteInputStream();
-  // bis.setBuf(bos.getBytes());
-  //
-  // log.debug("count: " + bis.getCount());
-  // // AudioInputStream ais = new AudioInputStream(bis, format,
-  // bis.getCount()/4);
-  //
-  // Clip clip = AudioSystem.getClip();
-  // // clip.open(ais);
-  // clip.open(format, bis.getBytes(), 0, bis.getCount());
-  // FloatControl control = (FloatControl)
-  // clip.getControl(FloatControl.Type.MASTER_GAIN);
-  // log.debug("maxGain: " + control.getMaximum());
-  // log.debug("minGain: " + control.getMinimum());
-  // control.setValue(gain);
-  //
-  // clipList.add(clip);
-  // log.debug("start clip on " + (System.nanoTime()/1000000));
-  // clip.start();
-  // // clip.drain();
-  //
-  // }
 
   public List<String> getPlayList() {
     return playList;
-  }
-
-  private class MyClip implements Runnable {
-    private Clip clip;
-    private int stopPosition; // miliseconds
-
-    public MyClip(Clip clip) {
-      this.clip = clip;
-    }
-
-    @Override
-    public void run() {
-      clip.setFramePosition(0);
-      clip.start();
-      try {
-        Thread.sleep(stopPosition);
-      } catch (InterruptedException e) {
-      }
-      clip.stop();
-      clip.close();
-    }
-
-    public void setStopPosition(int stopPosition) {
-      this.stopPosition = stopPosition;
-    }
-
-    public void play() {
-      Thread th = new Thread(this);
-      th.start();
-    }
-
   }
 
 }

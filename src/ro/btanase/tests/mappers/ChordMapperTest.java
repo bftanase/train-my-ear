@@ -1,6 +1,9 @@
 package ro.btanase.tests.mappers;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
@@ -12,11 +15,9 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import ro.btanase.chordlearning.data.ChordMapper;
 import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.LessonType;
 import ro.btanase.chordlearning.services.SessionFactory;
 import ro.btanase.tests.ChordDaoTest;
 import ro.btanase.tests.ChordLearningModuleTest;

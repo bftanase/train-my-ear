@@ -1,9 +1,6 @@
 package ro.btanase.chordlearning.dao;
 
-import java.util.List;
-
 import ro.btanase.chordlearning.domain.Chord;
-
 import ca.odell.glazedlists.EventList;
 
 

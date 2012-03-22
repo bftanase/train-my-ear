@@ -1,6 +1,5 @@
 package ro.btanase.chordlearning.dao;
 
-import ro.btanase.chordlearning.domain.ChordAccuracy;
 import ro.btanase.chordlearning.domain.Lesson;
 import ro.btanase.chordlearning.domain.Score;
 import ro.btanase.chordlearning.domain.wrappers.ChordAccuracyWrapper;

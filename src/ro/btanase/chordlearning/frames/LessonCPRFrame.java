@@ -7,6 +7,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,8 +40,6 @@ import ro.btanase.utils.Searchable;
 import ca.odell.glazedlists.BasicEventList;
 
 import com.google.inject.Inject;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class LessonCPRFrame extends JDialog {
   private JTextField tfLessonName;

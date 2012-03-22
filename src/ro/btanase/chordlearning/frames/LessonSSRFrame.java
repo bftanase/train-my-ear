@@ -1,27 +1,27 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
@@ -39,9 +39,6 @@ import ro.btanase.mediaplayer.MediaPlayer;
 import ro.btanase.utils.ListUtils;
 
 import com.google.inject.Inject;
-import javax.swing.JScrollPane;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class LessonSSRFrame extends JDialog {
   private JTextField tfLessonName;

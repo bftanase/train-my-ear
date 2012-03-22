@@ -10,11 +10,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.ChordAccuracy;
 import ro.btanase.chordlearning.domain.ExerciseResult;
 import ro.btanase.chordlearning.domain.Lesson;
 import ro.btanase.chordlearning.domain.Score;
@@ -23,6 +18,9 @@ import ro.btanase.chordlearning.domain.wrappers.LessonEvolutionWrapper;
 import ro.btanase.chordlearning.services.JdbcService;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class ScoreDaoDbImpl implements ScoreDao {

@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 
 import ro.btanase.chordlearning.services.JdbcService;
 

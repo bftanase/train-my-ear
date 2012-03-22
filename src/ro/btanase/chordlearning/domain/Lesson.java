@@ -1,8 +1,6 @@
 package ro.btanase.chordlearning.domain;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 import ca.odell.glazedlists.BasicEventList;

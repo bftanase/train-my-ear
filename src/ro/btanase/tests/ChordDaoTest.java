@@ -1,12 +1,12 @@
 package ro.btanase.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
@@ -16,12 +16,9 @@ import org.junit.Test;
 
 import ro.btanase.chordlearning.dao.ChordDao;
 import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.LessonType;
-import ro.btanase.chordlearning.exceptions.ConstraintException;
 import ro.btanase.chordlearning.services.JdbcService;
 import ro.btanase.chordlearning.services.UserData;
 import ro.btanase.chordlearning.services.UserDataImpl;
-
 import ca.odell.glazedlists.EventList;
 
 import com.google.inject.Guice;

@@ -11,7 +11,6 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 
 import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.LessonType;
 import ro.btanase.chordlearning.exceptions.ConstraintException;
 import ro.btanase.chordlearning.services.JdbcService;
 import ro.btanase.chordlearning.services.UserData;

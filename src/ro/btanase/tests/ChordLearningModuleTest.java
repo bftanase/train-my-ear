@@ -1,14 +1,7 @@
 package ro.btanase.tests;
 
-import ro.btanase.chordlearning.dao.ChordDao;
-import ro.btanase.chordlearning.dao.ChordDaoDbImpl;
-import ro.btanase.chordlearning.services.JdbcService;
-import ro.btanase.chordlearning.services.MessengerService;
-import ro.btanase.chordlearning.services.MessengerServiceSwingImpl;
 import ro.btanase.chordlearning.services.SessionFactory;
 import ro.btanase.chordlearning.services.SessionFactoryImplTest;
-import ro.btanase.chordlearning.services.UserData;
-import ro.btanase.chordlearning.services.UserDataImpl;
 
 import com.google.inject.AbstractModule;
 

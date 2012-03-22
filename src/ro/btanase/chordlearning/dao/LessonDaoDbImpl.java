@@ -8,16 +8,16 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.LessonType;
 import ro.btanase.chordlearning.domain.Lesson;
+import ro.btanase.chordlearning.domain.LessonType;
 import ro.btanase.chordlearning.services.JdbcService;
 import ro.btanase.chordlearning.services.UserData;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class LessonDaoDbImpl implements LessonDao {

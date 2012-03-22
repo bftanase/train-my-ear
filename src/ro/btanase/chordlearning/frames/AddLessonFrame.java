@@ -2,15 +2,18 @@ package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -31,18 +34,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventListModel;
 
 import com.google.inject.Inject;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.ListSelectionModel;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-
-import org.hsqldb.lib.tar.RB;
-import java.awt.GridLayout;
 
 public class AddLessonFrame extends JDialog {
 

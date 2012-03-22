@@ -14,10 +14,11 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import net.miginfocom.swing.MigLayout;
 import ro.btanase.chordlearning.services.UserData;
 
 import com.google.inject.Inject;

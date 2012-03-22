@@ -16,17 +16,17 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.apache.log4j.Logger;
 
-import com.google.inject.Inject;
-
-import net.miginfocom.swing.MigLayout;
 import ro.btanase.btvalidators.BTValidator;
 import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.LessonType;
 import ro.btanase.mediaplayer.IMPCallback;
 import ro.btanase.mediaplayer.MediaPlayer;
 import ro.btanase.utils.FileUtils;
+
+import com.google.inject.Inject;
 
 public class AddChordDialog extends JDialog {
 

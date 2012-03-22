@@ -1,12 +1,7 @@
 package ro.btanase.chordlearning.dao;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -15,9 +10,7 @@ import org.apache.log4j.Logger;
 
 import ro.btanase.chordlearning.data.ChordMapper;
 import ro.btanase.chordlearning.domain.Chord;
-import ro.btanase.chordlearning.domain.LessonType;
 import ro.btanase.chordlearning.exceptions.ConstraintException;
-import ro.btanase.chordlearning.services.JdbcService;
 import ro.btanase.chordlearning.services.SessionFactory;
 import ro.btanase.chordlearning.services.UserData;
 import ro.btanase.mediaplayer.MediaPlayer;

@@ -1,10 +1,11 @@
 package ro.btanase.utils;
 
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class FileUtilsTest {
 

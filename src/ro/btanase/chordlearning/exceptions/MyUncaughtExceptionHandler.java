@@ -1,7 +1,6 @@
 package ro.btanase.chordlearning.exceptions;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;

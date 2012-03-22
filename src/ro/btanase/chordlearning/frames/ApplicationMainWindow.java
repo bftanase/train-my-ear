@@ -1,22 +1,33 @@
 package ro.btanase.chordlearning.frames;
 
+import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.URI;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
+
+import org.apache.log4j.Logger;
+
 import ro.btanase.chordlearning.ChordLearningApp;
 import ro.btanase.chordlearning.dao.LessonDao;
 import ro.btanase.chordlearning.dao.ScoreDao;
@@ -26,24 +37,6 @@ import ca.odell.glazedlists.swing.EventListModel;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-
-import javax.swing.JPopupMenu;
-import java.awt.Component;
-import java.awt.Desktop;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.URI;
-
-import javax.swing.JMenuItem;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.SwingConstants;
-import javax.swing.JTextPane;
-
-import org.apache.log4j.Logger;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.ListSelectionModel;
 
 public class ApplicationMainWindow extends JFrame {
 

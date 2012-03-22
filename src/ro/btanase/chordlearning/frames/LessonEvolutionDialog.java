@@ -1,15 +1,16 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import net.miginfocom.swing.MigLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -21,19 +22,14 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import ro.btanase.chordlearning.dao.LessonDao;
+import ro.btanase.chordlearning.dao.ScoreDao;
+import ro.btanase.chordlearning.domain.Lesson;
+import ro.btanase.chordlearning.domain.wrappers.LessonEvolutionWrapper;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventComboBoxModel;
 
 import com.google.inject.Inject;
-
-import ro.btanase.chordlearning.dao.LessonDao;
-import ro.btanase.chordlearning.dao.ScoreDao;
-import ro.btanase.chordlearning.domain.Lesson;
-import ro.btanase.chordlearning.domain.Score;
-import ro.btanase.chordlearning.domain.wrappers.LessonEvolutionWrapper;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class LessonEvolutionDialog extends JDialog {
 

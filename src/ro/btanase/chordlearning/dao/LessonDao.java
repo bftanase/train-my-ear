@@ -1,11 +1,8 @@
 package ro.btanase.chordlearning.dao;
 
-import java.util.List;
-
-import ca.odell.glazedlists.EventList;
-
 import ro.btanase.chordlearning.domain.Chord;
 import ro.btanase.chordlearning.domain.Lesson;
+import ca.odell.glazedlists.EventList;
 
 
 public interface LessonDao {

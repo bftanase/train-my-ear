@@ -1,18 +1,16 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import java.awt.Font;
 import java.awt.Color;
+import java.awt.Font;
+
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+
+import net.miginfocom.swing.MigLayout;
 
 public class TimerProgressDialog extends JDialog {
 
