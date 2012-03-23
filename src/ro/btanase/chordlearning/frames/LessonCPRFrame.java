@@ -199,10 +199,10 @@ public class LessonCPRFrame extends JDialog {
 
   private void onBtnPlayActionPerformed() {
     if (sequencePlayer.getPlayList() != playList) {
-      sequencePlayer.setPlayList(playList);
+      sequencePlayer.setPlayList(playList, lesson.getChordDelay());
     }
 
-    sequencePlayer.play(lesson.getChordDelay());
+    sequencePlayer.play();
 
   }
 
