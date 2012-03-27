@@ -84,10 +84,15 @@ public class WaveSoundMixer {
     // start with an empty stream to mix; size equal to first sound in list
     byte[] hostBuffer = new byte[bufferList.get(0).length];
     
-    for(byte[] currentBuffer : bufferList){
+    for (int i=0; i < bufferList.size(); i++){
+      byte[] currentBuffer = bufferList.get(i);
       mixStreams(currentBuffer, hostBuffer);
-      hostBuffer = addSilence(interval, hostBuffer);
+      
+      if (i != bufferList.size() -1){
+        hostBuffer = addSilence(interval, hostBuffer);
+      }
     }
+    
     return hostBuffer;
   }
 
