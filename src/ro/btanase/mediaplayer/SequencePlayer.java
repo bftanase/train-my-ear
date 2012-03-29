@@ -5,8 +5,10 @@ import imaadpcm.ImaAdpcm;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,6 +77,12 @@ public class SequencePlayer {
         }
 
         byte[] bArr = bos.toByteArray();
+        
+        // for some unkown reason the decoded PCM stream has a few miliseconds of "silence" in the beggining
+        // we need to get rid of that silence, cause it will cause timing problems
+        int silenceOffset = AudioUtils.findSilenceEndOffset(bArr, 50);
+        bArr = Arrays.copyOfRange(bArr, silenceOffset, bArr.length);
+        
         audioBufferList.add(bArr);
         
       } catch (Exception e) {
@@ -93,6 +101,7 @@ public class SequencePlayer {
     
     try {
       byte[] finalAudioData = wsm.createAudioStreamFromBufferList(audioBufferList, interval);
+      
       clip.open(FORMAT, finalAudioData, 0, finalAudioData.length);
     } catch (Exception e) {
       throw new RuntimeException(e);
