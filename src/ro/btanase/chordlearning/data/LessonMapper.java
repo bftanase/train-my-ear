@@ -9,6 +9,9 @@ import ro.btanase.chordlearning.domain.Lesson;
 public interface LessonMapper {
   public List<Lesson> selectAll();
   public Lesson selectById(int id);
+  public int selectLastOrderIdx();
+  public Lesson selectPreviousLesson(int orderIdx);
+  public Lesson selectNextLesson(int orderIdx);
 
   public int lastInsertId();
   public void insert(Lesson lesson);

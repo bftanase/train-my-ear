@@ -69,7 +69,11 @@ public class LessonDaoIbatisImpl implements LessonDao {
     SqlSession session = sessionFactory.get().openSession();
 
     try {
-      LessonMapper mapper = session.getMapper(LessonMapper.class);      
+      LessonMapper mapper = session.getMapper(LessonMapper.class);
+      
+      int lastOrderIdx = mapper.selectLastOrderIdx();
+      lesson.setOrder(lastOrderIdx + 1);
+      
       mapper.insert(lesson);
 
       EventList<Chord> chordList = lesson.getChordSequence();
@@ -78,7 +82,6 @@ public class LessonDaoIbatisImpl implements LessonDao {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("chordId", chord.getId());
         param.put("lessonId", lesson.getId());
-        
         mapper.insertChordToLesson(param);
       }
       
@@ -97,10 +100,12 @@ public class LessonDaoIbatisImpl implements LessonDao {
     try{
       LessonMapper mapper = session.getMapper(LessonMapper.class);      
       mapper.delete(lesson.getId());
-      fetchLessons();
+      session.commit();
     }finally{
       session.close();
     }
+
+    fetchLessons();
 
   }
 
@@ -142,8 +147,16 @@ public class LessonDaoIbatisImpl implements LessonDao {
 
   @Override
   public Lesson getLesson(String lessonName) {
-    // TODO Auto-generated method stub
-    return null;
+    Lesson result = null;
+    for (int i = 0; i < lessonList.size(); i++){
+      Lesson lesson = lessonList.get(i);
+      if (lesson.getLessonName().equals(lessonName)){
+        result = lesson;
+        break;
+      }
+    }
+    
+    return result;
   }
 
   @Override
@@ -159,5 +172,68 @@ public class LessonDaoIbatisImpl implements LessonDao {
     }
     return chordList;
   }
+  
 
+  @Override
+  public void moveUp(Lesson lesson) {
+    SqlSession session = sessionFactory.get().openSession();
+    
+    Lesson previousLesson = null;
+    
+    try {
+      LessonMapper mapper = session.getMapper(LessonMapper.class);
+      previousLesson = mapper.selectPreviousLesson(lesson.getOrder());
+      
+      if (previousLesson == null){
+        return;
+      }
+      
+      int temp = lesson.getOrder();
+      lesson.setOrder(previousLesson.getOrder());
+      previousLesson.setOrder(null);
+      mapper.update(previousLesson);
+      mapper.update(lesson);
+      
+      previousLesson.setOrder(temp);
+      mapper.update(previousLesson);
+      session.commit();
+      
+    } finally{
+      session.close();
+    }
+
+    
+  }
+
+  @Override
+  public void moveDown(Lesson lesson) {
+    SqlSession session = sessionFactory.get().openSession();
+    
+    Lesson nextLesson = null;
+    
+    try {
+      LessonMapper mapper = session.getMapper(LessonMapper.class);
+      nextLesson = mapper.selectNextLesson(lesson.getOrder());
+
+      if (nextLesson == null){
+        return;
+      }
+
+      int temp = lesson.getOrder();
+      lesson.setOrder(nextLesson.getOrder());
+      nextLesson.setOrder(null);
+      mapper.update(nextLesson);
+      mapper.update(lesson);
+      
+      nextLesson.setOrder(temp);
+      mapper.update(nextLesson);
+      session.commit();
+      
+    } finally{
+      session.close();
+    }    
+  }
+
+  
+  
 }

@@ -22,6 +22,7 @@ import ro.btanase.chordlearning.domain.Lesson;
 import ca.odell.glazedlists.swing.EventListModel;
 
 import com.google.inject.Inject;
+import javax.swing.ListSelectionModel;
 
 public class LessonManagerFrame extends JDialog{
 
@@ -31,6 +32,8 @@ public class LessonManagerFrame extends JDialog{
   private JButton btnEditLesson;
   private JButton btnRemoveLesson;
   private JList jlistLessons;
+  private JButton btnMoveUp;
+  private JButton btnMovedown;
 
 
   /**
@@ -55,6 +58,7 @@ public class LessonManagerFrame extends JDialog{
     contentPane.add(scrollPane, "cell 0 1 1 10,grow");
     
     jlistLessons = new JList();
+    jlistLessons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     scrollPane.setViewportView(jlistLessons);
     
     btnNewLesson = new JButton("New Lesson");
@@ -84,7 +88,50 @@ public class LessonManagerFrame extends JDialog{
     });
     contentPane.add(btnRemoveLesson, "cell 1 5,growx");
     
+    btnMoveUp = new JButton("Move Up");
+    btnMoveUp.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        onBtnMoveupActionPerformed();
+      }
+    });
+    contentPane.add(btnMoveUp, "cell 1 7,growx");
+    
+    btnMovedown = new JButton("MoveDown");
+    btnMovedown.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        onBtnMovedownActionPerformed();
+      }
+    });
+    contentPane.add(btnMovedown, "cell 1 8,growx");
+    
     initModels();
+  }
+
+
+  protected void onBtnMoveupActionPerformed() {
+    if (jlistLessons.getSelectedValue() != null){
+      Lesson lesson = (Lesson) jlistLessons.getSelectedValue();
+      m_lessons.moveUp(lesson);
+      m_lessons.fetchLessons();
+      lesson = m_lessons.getLesson(lesson.getLessonName());
+      jlistLessons.clearSelection();
+      jlistLessons.setSelectedValue(lesson, true);
+    }
+    
+  }
+
+
+  protected void onBtnMovedownActionPerformed() {
+    if (jlistLessons.getSelectedValue() != null){
+      Lesson lesson = (Lesson) jlistLessons.getSelectedValue();
+      m_lessons.moveDown(lesson);
+      m_lessons.fetchLessons();
+      lesson = m_lessons.getLesson(lesson.getLessonName());
+      jlistLessons.clearSelection();
+      jlistLessons.setSelectedValue(lesson, true);
+    }
+    
+    
   }
 
 

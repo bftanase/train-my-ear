@@ -11,6 +11,7 @@ public class Lesson implements Serializable {
   private String lessonName;
   private int noQuestions;
   private LessonType type;
+  private Integer order;
 
   // these are used if type == LessonType.PROGRESSION
   private int noChordsInSequence;
@@ -104,6 +105,14 @@ public class Lesson implements Serializable {
 
   public void setChordDelay(int chordDelay) {
     this.chordDelay = chordDelay;
+  }
+
+  public Integer getOrder() {
+    return order;
+  }
+
+  public void setOrder(Integer order) {
+    this.order = order;
   }
   
   

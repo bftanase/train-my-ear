@@ -1,10 +1,22 @@
 package ro.btanase.chordlearning;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import ro.btanase.chordlearning.data.LessonMapper;
+import ro.btanase.chordlearning.domain.Lesson;
+import ro.btanase.chordlearning.services.SessionFactory;
+import ro.btanase.tests.ChordLearningModuleTest;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 public class Test {
 
@@ -14,34 +26,27 @@ public class Test {
    */
   public static void main(String[] args) throws IOException {
 
-    final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
+    Injector injector = Guice.createInjector(new ChordLearningModule());
+    SessionFactory sessionFactory = injector.getInstance(SessionFactory.class);
     
-    Runnable beeper = new Runnable() {
+    SqlSession session = sessionFactory.get().openSession();
+    
+    LessonMapper mapper = session.getMapper(LessonMapper.class);
+    
+    List<Lesson> lessonList = mapper.selectAll();
+    
+    int i=0;
+    
+    for (Lesson lesson : lessonList) {
+      lesson.setOrder(i);
+      i++;
       
-      @Override
-      public void run() {
-        System.out.println("Beeeep");
-//        try {
-//          Thread.sleep(2000);
-//        } catch (InterruptedException e) {
-//          // TODO Auto-generated catch block
-//          e.printStackTrace();
-//        }
-      }
-    };
-
-    final ScheduledFuture<?> beeperHandle = scheduler.scheduleAtFixedRate(beeper, 0, 500, TimeUnit.MILLISECONDS);
+      mapper.update(lesson);
+    }
     
-    scheduler.schedule(new Runnable() {
-      
-      @Override
-      public void run() {
-        beeperHandle.cancel(true);
-        
-      }
-    }, 60 * 60, TimeUnit.SECONDS);
+    session.commit();
     
-    System.in.read();
+    session.close();
   }
 
 }

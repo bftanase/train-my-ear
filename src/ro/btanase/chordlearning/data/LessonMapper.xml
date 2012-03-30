@@ -10,8 +10,10 @@
 			L_NO_QUESTIONS AS noQuestions,
 			L_TYPE AS type,
 			L_NO_CHORDS AS noChordsInSequence,
-			L_CHORD_DELAY AS chordDelay
+			L_CHORD_DELAY AS chordDelay,
+			L_ORDER AS "order"
 		FROM lesson
+		  ORDER BY L_ORDER
 	</select>
 
 	<select id="selectById" resultType="ro.btanase.chordlearning.domain.Lesson" parameterType="int">
@@ -21,11 +23,42 @@
 			L_NO_QUESTIONS AS noQuestions,
 			L_TYPE AS type,
 			L_NO_CHORDS AS noChordsInSequence,
-			L_CHORD_DELAY AS chordDelay
+			L_CHORD_DELAY AS chordDelay,
+			L_ORDER AS "order"
 		FROM lesson
 		WHERE
 			L_ID = #{id}
 	</select>
+
+  <select id="selectPreviousLesson" resultType="ro.btanase.chordlearning.domain.Lesson" parameterType="int">
+  <![CDATA[
+    SELECT
+      L_ID AS id,
+      L_NAME AS lessonName,
+      L_NO_QUESTIONS AS noQuestions,
+      L_TYPE AS type,
+      L_NO_CHORDS AS noChordsInSequence,
+      L_CHORD_DELAY AS chordDelay,
+      L_ORDER AS "order"
+    FROM lesson 
+    WHERE L_ORDER < #{orderId} order by L_ORDER DESC limit 1
+  ]]>
+  </select>
+
+  <select id="selectNextLesson" resultType="ro.btanase.chordlearning.domain.Lesson" parameterType="int">
+  <![CDATA[  
+    SELECT
+      L_ID AS id,
+      L_NAME AS lessonName,
+      L_NO_QUESTIONS AS noQuestions,
+      L_TYPE AS type,
+      L_NO_CHORDS AS noChordsInSequence,
+      L_CHORD_DELAY AS chordDelay,
+      L_ORDER AS "order"
+    FROM lesson 
+    WHERE L_ORDER > #{orderId} order by L_ORDER ASC limit 1
+  ]]>
+  </select>
 
 	<select id="selectChordsByLessonId" resultType="ro.btanase.chordlearning.domain.Chord" parameterType="int">
 			SELECT 
@@ -38,6 +71,10 @@
 			    ON LESSON_CHORD.C_ID = CHORD.C_ID 
 			WHERE L_ID = #{lessonId}
 	</select>
+
+	<select id="selectLastOrderIdx" resultType="int">
+    SELECT L_ORDER FROM LESSON ORDER BY  L_ORDER DESC LIMIT 1
+	</select>
  	
 	<insert id="insert" parameterType="ro.btanase.chordlearning.domain.Lesson"
 						keyProperty="id" useGeneratedKeys="true">
@@ -47,7 +84,8 @@
 				L_NO_QUESTIONS,
 				L_TYPE,
 				L_NO_CHORDS,
-				L_CHORD_DELAY	
+				L_CHORD_DELAY,
+				L_ORDER	
 			)
 		VALUES
 			(
@@ -55,7 +93,8 @@
 				#{noQuestions},
 				#{type},
 				#{noChordsInSequence},
-				#{chordDelay}
+				#{chordDelay},
+				#{order}
 			)	
 	</insert>
 
@@ -81,7 +120,8 @@
 			L_NO_QUESTIONS = #{noQuestions},
 			L_TYPE = #{type},
 			L_NO_CHORDS = #{noChordsInSequence},
-			L_CHORD_DELAY = #{chordDelay}
+			L_CHORD_DELAY = #{chordDelay},
+			L_ORDER = #{order}
 		WHERE
 			L_ID = #{id}
 	</update>

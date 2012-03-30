@@ -18,5 +18,9 @@ public interface LessonDao {
   
   public Lesson getLesson(String lessonName);
   
+  public void moveUp(Lesson lesson);
+
+  public void moveDown(Lesson lesson);
+  
   public EventList<Chord> getChordsFromLesson(int lessonId);
 }
