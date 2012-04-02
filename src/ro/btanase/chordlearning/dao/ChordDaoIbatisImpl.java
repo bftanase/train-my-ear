@@ -40,13 +40,13 @@ public class ChordDaoIbatisImpl implements ChordDao {
 
   @Override
   public EventList<Chord> fetchChords() {
-    chordList = new BasicEventList<Chord>();
+    chordList.clear();
       
     SqlSession session = sessionFactory.get().openSession();
 
     try{
       ChordMapper chordMapper = session.getMapper(ChordMapper.class);
-      chordList = GlazedLists.eventList(chordMapper.selectAll());
+      chordList.addAll(GlazedLists.eventList(chordMapper.selectAll()));
     }finally{
       session.close();
     }
@@ -68,10 +68,12 @@ public class ChordDaoIbatisImpl implements ChordDao {
     try {
       ChordMapper chordMapper = session.getMapper(ChordMapper.class);
       chordMapper.insert(chord);
+      session.commit();
     }finally{
       session.close();
     }
 
+    fetchChords();
   }
 
   @Override

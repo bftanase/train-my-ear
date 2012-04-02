@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -15,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -27,8 +30,9 @@ import ro.btanase.mediaplayer.MediaPlayer;
 import ro.btanase.utils.FileUtils;
 
 import com.google.inject.Inject;
+import javax.swing.JToggleButton;
 
-public class AddChordDialog extends JDialog {
+public class AddChordDialog extends JDialog implements ActionListener{
 
   private final JPanel contentPanel = new JPanel();
   private JTextField tfChord;
@@ -46,6 +50,16 @@ public class AddChordDialog extends JDialog {
   
   private Logger log = Logger.getLogger(getClass());
   private JLabel lblSelectedFile;
+  private JPanel panel;
+  private JToggleButton tglSlot1;
+  private JToggleButton tglSlot2;
+  private JToggleButton tglSlot3;
+  private JToggleButton tglSlot4;
+  private JToggleButton tglSlot5;
+  private JLabel lblNewLabel;
+  private JTextField tfPackName;
+  
+  private ButtonGroup buttonGroupToggle;
   
   /**
    * This constructor should be used when editing chords
@@ -69,40 +83,66 @@ public class AddChordDialog extends JDialog {
     setModal(true);
     this.dialogCallback = dialogCallback;
     setTitle("Add new chord");
-    setBounds(100, 100, 447, 197);
+    setBounds(100, 100, 611, 234);
     getContentPane().setLayout(new BorderLayout());
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
-    contentPanel.setLayout(new MigLayout("", "[][][grow][]", "[][][][]"));
+    contentPanel.setLayout(new MigLayout("", "[][][grow][]", "[][][][][]"));
+    {
+      panel = new JPanel();
+      contentPanel.add(panel, "cell 0 0 4 1,grow");
+      panel.setLayout(new MigLayout("", "[120][120][120][120][120]", "[46.00,fill]"));
+      {
+        tglSlot1 = new JToggleButton("Acoustic by LBro");
+        panel.add(tglSlot1, "cell 0 0,growx");
+      }
+      {
+        tglSlot2 = new JToggleButton("Free Slot");
+        panel.add(tglSlot2, "cell 1 0,growx");
+      }
+      {
+        tglSlot3 = new JToggleButton("Free Slot");
+        panel.add(tglSlot3, "cell 2 0,growx");
+      }
+      {
+        tglSlot4 = new JToggleButton("Free Slot");
+        panel.add(tglSlot4, "cell 3 0,growx");
+      }
+      {
+        tglSlot5 = new JToggleButton("Free Slot");
+        panel.add(tglSlot5, "cell 4 0,growx");
+      }
+    }
+    {
+      lblNewLabel = new JLabel("Sample pack name:");
+      contentPanel.add(lblNewLabel, "cell 0 1");
+    }
+    {
+      tfPackName = new JTextField();
+      contentPanel.add(tfPackName, "cell 2 1,growx");
+      tfPackName.setColumns(10);
+    }
     {
       JLabel lblChordName = new JLabel("Chord name:");
-      contentPanel.add(lblChordName, "cell 1 1,alignx trailing");
+      contentPanel.add(lblChordName, "cell 0 2 2 1,alignx left");
     }
     {
       tfChord = new JTextField();
       tfChord.setToolTipText("");
-      contentPanel.add(tfChord, "cell 2 1 2 1,growx");
+      contentPanel.add(tfChord, "cell 2 2,growx");
       tfChord.setColumns(10);
     }
     {
-      btnRecord = new JButton("Record");
-      btnRecord.setMnemonic('r');
-      btnRecord.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          onBtnRecordActionPerformed();
-        }
-      });
-      contentPanel.add(btnRecord, "cell 1 2");
-    }
-    {
-      btnPlay = new JButton("Play");
-      btnPlay.setMnemonic('p');
-      btnPlay.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          onBtnPlayActionPerformed();
-        }
-      });
-      contentPanel.add(btnPlay, "flowx,cell 2 2");
+      {
+        btnRecord = new JButton("Record");
+        btnRecord.setMnemonic('r');
+        btnRecord.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            onBtnRecordActionPerformed();
+          }
+        });
+        contentPanel.add(btnRecord, "cell 0 3,alignx right");
+      }
     }
     {
       btnImportFromFile = new JButton("Import from file (wav) ...");
@@ -112,11 +152,21 @@ public class AddChordDialog extends JDialog {
           onBtnImportActionPerformed();
         }
       });
-      contentPanel.add(btnImportFromFile, "cell 3 2");
+      btnPlay = new JButton("Play");
+      btnPlay.setMnemonic('p');
+      btnPlay.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          onBtnPlayActionPerformed();
+        }
+      });
+      contentPanel.add(btnPlay, "flowx,cell 1 3");
+      
+          btnPlay.setEnabled(false);
+      contentPanel.add(btnImportFromFile, "cell 3 3");
     }
     {
       chckbxDelayedRecording = new JCheckBox("Delayed Recording (5 sec)");
-      contentPanel.add(chckbxDelayedRecording, "cell 1 3 2 1");
+      contentPanel.add(chckbxDelayedRecording, "cell 1 4 2 1");
     }
     {
       JPanel buttonPane = new JPanel();
@@ -145,12 +195,60 @@ public class AddChordDialog extends JDialog {
         buttonPane.add(cancelButton);
       }
     }
-
-    btnPlay.setEnabled(false);
     {
       lblSelectedFile = new JLabel("");
-      contentPanel.add(lblSelectedFile, "cell 3 3,alignx center");
+      contentPanel.add(lblSelectedFile, "cell 3 4,alignx center");
     }
+    
+    // set slot buttons behaviour
+    buttonGroupToggle = new ButtonGroup();
+    buttonGroupToggle.add(tglSlot1);
+    buttonGroupToggle.add(tglSlot2);
+    buttonGroupToggle.add(tglSlot3);
+    buttonGroupToggle.add(tglSlot4);
+    buttonGroupToggle.add(tglSlot5);
+    
+    tglSlot1.addActionListener(this);
+    tglSlot2.addActionListener(this);
+    tglSlot3.addActionListener(this);
+    tglSlot4.addActionListener(this);
+    tglSlot5.addActionListener(this);
+    
+    // start with first slot selected
+    tglSlot1.doClick();
+    
+    tfPackName.getDocument().addDocumentListener(new DocumentListener() {
+      
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        update();
+      }
+      
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        update();
+      }
+      
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        update();
+      }
+      
+      private void update(){
+        if (tglSlot1.isSelected()){
+          tglSlot1.setText(tfPackName.getText());
+        } else if (tglSlot2.isSelected()){
+          tglSlot2.setText(tfPackName.getText());
+        } else if (tglSlot3.isSelected()){
+          tglSlot3.setText(tfPackName.getText());
+        } else if (tglSlot4.isSelected()){
+          tglSlot4.setText(tfPackName.getText());
+        } else if (tglSlot5.isSelected()){
+          tglSlot5.setText(tfPackName.getText());
+        }
+      }
+    });
+    
   }
 
   private void onBtnCancelActionPerformed() {
@@ -246,6 +344,21 @@ public class AddChordDialog extends JDialog {
       log.debug("fileChooserPath: " + fileChooserPath);
       mediaPlayer.setMemoryAudioStream(file);
       btnPlay.setEnabled(true);
+    }
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == tglSlot1){
+      tfPackName.setText(tglSlot1.getText());
+    } else if(e.getSource() == tglSlot2){
+      tfPackName.setText(tglSlot2.getText());
+    } else if(e.getSource() == tglSlot3){
+      tfPackName.setText(tglSlot3.getText());
+    } else if(e.getSource() == tglSlot4){
+      tfPackName.setText(tglSlot4.getText());
+    } else if(e.getSource() == tglSlot5){
+      tfPackName.setText(tglSlot5.getText());
     }
   }
 
