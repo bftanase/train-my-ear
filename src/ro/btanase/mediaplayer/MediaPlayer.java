@@ -29,9 +29,12 @@ import com.google.inject.Singleton;
 public class MediaPlayer {
 
   private static MediaPlayer instance;
+  
+  public static final int NO_SLOTS = 5;
+  
   // private Boolean shouldStop = false;
   private boolean shouldStop;
-  private AudioInputStream memoryInputStream;
+  private AudioInputStream[] memoryInputStreamSlots = new AudioInputStream[5];
   AudioFormat format;
   private Logger log = Logger.getLogger(getClass());
   private SourceDataLine sourceLine;
@@ -42,7 +45,7 @@ public class MediaPlayer {
     format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, (16 / 8) * 2, 44100, false);
   }
 
-  public void playImaFile(String fileName, final IMPCallback callback) {
+  public void playImaFile(String fileName, final IMPCallback callback, int slot) {
     final File file = new File(userData.getMediaFolder() + File.separator + fileName);
 
     Thread thread = new Thread(new Runnable() {
@@ -103,7 +106,7 @@ public class MediaPlayer {
   }
   
   
-  public void playFromMemory(final IMPCallback callback) {
+  public void playFromMemory(final IMPCallback callback, final int slot) {
 
     Thread thread = new Thread(new Runnable() {
 
@@ -114,12 +117,12 @@ public class MediaPlayer {
         final int bufSize = 16384;
 
         // make sure we have something to play
-        if (memoryInputStream == null) {
+        if (memoryInputStreamSlots[slot] == null) {
           throw new RuntimeException("Nothing to play!");
         }
         // reset to the beginnning of the stream
         try {
-          memoryInputStream.reset();
+          memoryInputStreamSlots[slot].reset();
         } catch (Exception e) {
           // throw new RuntimeException("Unable to reset stream!", e);
           log.debug(e);
@@ -155,7 +158,7 @@ public class MediaPlayer {
 
         while (shouldStop != true) {
           try {
-            if ((numBytesRead = memoryInputStream.read(data)) == -1) {
+            if ((numBytesRead = memoryInputStreamSlots[slot].read(data)) == -1) {
               break;
             }
             int numBytesRemaining = numBytesRead;
@@ -184,13 +187,13 @@ public class MediaPlayer {
   /**
    * Reads data from the input channel and writes to the output stream
    */
-  public void recordToMemoryBuffer(final IMPCallback callback) {
+  public void recordToMemoryBuffer(final IMPCallback callback, final int slot) {
 
     Thread thread = new Thread(new Runnable() {
       public void run() {
 
         double duration = 0;
-        memoryInputStream = null;
+        memoryInputStreamSlots[slot] = null;
         TargetDataLine line;
 
         // define the required attributes for our line,
@@ -246,13 +249,13 @@ public class MediaPlayer {
 
         byte audioBytes[] = out.toByteArray();
         ByteArrayInputStream bais = new ByteArrayInputStream(audioBytes);
-        memoryInputStream = new AudioInputStream(bais, format, audioBytes.length / frameSizeInBytes);
+        memoryInputStreamSlots[slot] = new AudioInputStream(bais, format, audioBytes.length / frameSizeInBytes);
 
-        long milliseconds = (long) ((memoryInputStream.getFrameLength() * 1000) / format.getFrameRate());
+        long milliseconds = (long) ((memoryInputStreamSlots[slot].getFrameLength() * 1000) / format.getFrameRate());
         duration = milliseconds / 1000.0;
 
         try {
-          memoryInputStream.reset();
+          memoryInputStreamSlots[slot].reset();
         } catch (Exception ex) {
           throw new RuntimeException(ex);
         }
@@ -266,14 +269,14 @@ public class MediaPlayer {
     thread.start();
   }
 
-  public void saveToFile(String name) {
+  public void saveToFile(String name, int slot) {
 
-    if (memoryInputStream == null) {
+    if (memoryInputStreamSlots[slot] == null) {
       throw new RuntimeException("No audio to save");
     }
     // reset to the beginnning of the captured data
     try {
-      memoryInputStream.reset();
+      memoryInputStreamSlots[slot].reset();
     } catch (Exception e) {
       log.debug("Error saving file", e);
       throw new RuntimeException("Can't reset stream");
@@ -286,7 +289,7 @@ public class MediaPlayer {
       // throw new IOException("Problems writing to file");
       // }
       ByteArrayOutputStream out = new ByteArrayOutputStream();
-      if (AudioSystem.write(memoryInputStream, AudioFileFormat.Type.WAVE, out) == -1) {
+      if (AudioSystem.write(memoryInputStreamSlots[slot], AudioFileFormat.Type.WAVE, out) == -1) {
         throw new IOException("Problems writing to file");
       }
 
@@ -304,19 +307,23 @@ public class MediaPlayer {
     }
   }
 
-  public void emptyRecordBuffer() {
-    memoryInputStream = null;
+  public void emptyRecordBuffer(int slot) {
+    try{
+      memoryInputStreamSlots[slot].close();
+    }catch(Exception e){}
+    
+    memoryInputStreamSlots[slot] = null;
   }
 
-  public boolean isBufferEmpty() {
-    if (memoryInputStream == null) {
+  public boolean isBufferEmpty(int slot) {
+    if (memoryInputStreamSlots[slot] == null) {
       return true;
     } else {
       return false;
     }
   }
 
-  public void setMemoryAudioStream(File file) {
+  public void setMemoryAudioStream(File file, int slot) {
     try {
       AudioFormat fileFormat = AudioSystem.getAudioFileFormat(file).getFormat();
       AudioInputStream waveFileStream = AudioSystem.getAudioInputStream(file);
@@ -333,7 +340,7 @@ public class MediaPlayer {
 
       waveFileStream = new AudioInputStream(bais, fileFormat, count / fileFormat.getFrameSize());
 
-      memoryInputStream = AudioSystem.getAudioInputStream(format, waveFileStream);
+      memoryInputStreamSlots[slot] = AudioSystem.getAudioInputStream(format, waveFileStream);
 
       waveFileStream.close();
 

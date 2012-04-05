@@ -197,20 +197,20 @@ public class LessonSSRFrame extends JDialog {
     // }
 
     mediaPlayer.stopPlayback();
+
+    
     mediaPlayer.playImaFile(activeChord.getFileName(), new IMPCallback() {
 
       @Override
       public void onStop() {
-        // TODO Auto-generated method stub
 
       }
 
       @Override
       public void onPlay() {
-        // TODO Auto-generated method stub
 
       }
-    });
+    }, 0);
 
   }
 

@@ -257,7 +257,7 @@ public class AddChordDialog extends JDialog implements ActionListener{
   }
 
   private void onBtnPlayActionPerformed() {
-
+    
     if (btnPlay.getText().startsWith("Play")) {
       mediaPlayer.playFromMemory(new IMPCallback() {
 
@@ -272,7 +272,7 @@ public class AddChordDialog extends JDialog implements ActionListener{
           btnPlay.setText("Stop");
           btnRecord.setEnabled(false);
         }
-      });
+      }, getActiveSlot());
     } else {
       mediaPlayer.stopPlayback();
     }
@@ -298,7 +298,7 @@ public class AddChordDialog extends JDialog implements ActionListener{
           btnRecord.setText("Stop");
           btnPlay.setEnabled(false);
         }
-      });
+      }, getActiveSlot());
 
     } else {
       mediaPlayer.stopRecording();
@@ -342,7 +342,7 @@ public class AddChordDialog extends JDialog implements ActionListener{
       fileChooserPath = file.getParent();
       lblSelectedFile.setText(file.getName());
       log.debug("fileChooserPath: " + fileChooserPath);
-      mediaPlayer.setMemoryAudioStream(file);
+      mediaPlayer.setMemoryAudioStream(file, getActiveSlot());
       btnPlay.setEnabled(true);
     }
   }
@@ -359,6 +359,22 @@ public class AddChordDialog extends JDialog implements ActionListener{
       tfPackName.setText(tglSlot4.getText());
     } else if(e.getSource() == tglSlot5){
       tfPackName.setText(tglSlot5.getText());
+    }
+  }
+  
+  private int getActiveSlot(){
+    if (tglSlot1.isSelected()){
+      return 0;
+    } else if (tglSlot2.isSelected()){
+      return 1;
+    } else if (tglSlot3.isSelected()){
+      return 2;
+    } else if (tglSlot4.isSelected()){
+      return 3;
+    } else if (tglSlot5.isSelected()){
+      return 4;
+    } else {
+      throw new IllegalStateException("At least one button must be pressed.");
     }
   }
 
