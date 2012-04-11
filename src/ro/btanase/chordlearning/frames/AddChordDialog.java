@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.annotation.PostConstruct;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -24,10 +25,12 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import ro.btanase.btvalidators.BTValidator;
+import ro.btanase.chordlearning.dao.SettingsDao;
 import ro.btanase.chordlearning.domain.Chord;
 import ro.btanase.mediaplayer.IMPCallback;
 import ro.btanase.mediaplayer.MediaPlayer;
 import ro.btanase.utils.FileUtils;
+import ro.btanase.utils.ReflectionUtils;
 
 import com.google.inject.Inject;
 import javax.swing.JToggleButton;
@@ -45,6 +48,10 @@ public class AddChordDialog extends JDialog implements ActionListener{
   
   @Inject 
   private MediaPlayer mediaPlayer;
+  
+  @Inject
+  private SettingsDao settingsDao;
+  
   private static String fileChooserPath ="./";
   
   
@@ -320,6 +327,8 @@ public class AddChordDialog extends JDialog implements ActionListener{
         editingChord.setChordName(chordName);
         dialogCallback.onSubmit(editingChord);
       }
+      
+      settingsDao.setSlots(getSlotsNames());
       this.dispose();
     } catch (Exception e) {
       log.debug("Error during form submit", e);
@@ -333,6 +342,25 @@ public class AddChordDialog extends JDialog implements ActionListener{
   }
 
   private void onBtnImportActionPerformed() {
+    // check if OK to overwrite
+    if (editingChord != null){
+      int currentSlot = getActiveSlot();
+      
+      String fileName = ReflectionUtils.invokeChordGetFileName(editingChord, currentSlot);
+      
+      if (fileName != null && (!fileName.isEmpty())){
+        int result = JOptionPane.showConfirmDialog(this, "This slot is not empty! Are you sure you wish to overwrite?", "Overwrite slot?",
+                          JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        
+        if (result == JOptionPane.NO_OPTION){
+          return;
+        }
+       
+      }
+      
+    }
+    
+    // ask for file to import
     JFileChooser fileChooser = new JFileChooser(fileChooserPath);
     
     fileChooser.showOpenDialog(AddChordDialog.this);
@@ -342,8 +370,13 @@ public class AddChordDialog extends JDialog implements ActionListener{
       fileChooserPath = file.getParent();
       lblSelectedFile.setText(file.getName());
       log.debug("fileChooserPath: " + fileChooserPath);
-      mediaPlayer.setMemoryAudioStream(file, getActiveSlot());
-      btnPlay.setEnabled(true);
+      try{
+        mediaPlayer.setMemoryAudioStream(file, getActiveSlot());
+        btnPlay.setEnabled(true);
+      } catch (RuntimeException e){
+        JOptionPane.showMessageDialog(this, "The file cannot be imported. Make sure it's the right format",
+              "Error importing file", JOptionPane.WARNING_MESSAGE);
+      }
     }
   }
 
@@ -378,4 +411,27 @@ public class AddChordDialog extends JDialog implements ActionListener{
     }
   }
 
+  private String[] getSlotsNames(){
+    String[] result = new String[5];
+    result[0] = tglSlot1.getText(); 
+    result[1] = tglSlot2.getText(); 
+    result[2] = tglSlot3.getText(); 
+    result[3] = tglSlot4.getText(); 
+    result[4] = tglSlot5.getText();
+    
+    return result;
+  }
+  
+  private void setSlotNames(String[] slots){
+    tglSlot1.setText(slots[0]);
+    tglSlot2.setText(slots[1]);
+    tglSlot3.setText(slots[2]);
+    tglSlot4.setText(slots[3]);
+    tglSlot5.setText(slots[4]);
+  }
+  
+  @Inject // nothing is really injected. Just a hack to get @PostConstruct like behaviour
+  public void postConstruct(){
+    setSlotNames(settingsDao.getSlots());
+  }
 }

@@ -47,7 +47,7 @@ public class UserDataImpl implements UserData {
     // create application.properties folder
     String homeDirectory = System.getProperty("user.home");
     
-    String propertiesDirectoryPath = homeDirectory + File.separator + ".gcet";
+    String propertiesDirectoryPath = homeDirectory + File.separator + UserData.DATA_DIR;
     File appPropertiesDir = new File(propertiesDirectoryPath);
     try{
       FileUtils.forceMkdir(appPropertiesDir);
@@ -85,7 +85,7 @@ public class UserDataImpl implements UserData {
     // first check if application.properties is found in user.home directory
     String homeDirectory = System.getProperty("user.home");
     log.debug("user home: " + homeDirectory);
-    File appPropertiesFile = new File(homeDirectory + File.separator + ".gcet" + File.separator + "application.properties");
+    File appPropertiesFile = new File(homeDirectory + File.separator + DATA_DIR + File.separator + "application.properties");
     
     if (!appPropertiesFile.exists()){
       return false;
@@ -144,7 +144,7 @@ public class UserDataImpl implements UserData {
     String homeDirectory = System.getProperty("user.home");
 
     File appPropertiesFile = new File(homeDirectory + File.separator
-        + ".gcet" + File.separator + "application.properties");
+        + UserData.DATA_DIR + File.separator + "application.properties");
     
     // read properties file and check if the DB version is up to date
     // if it's ok we will not query the schema further, we'll just assume is ok

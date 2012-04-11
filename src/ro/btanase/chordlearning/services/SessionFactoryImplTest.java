@@ -26,7 +26,7 @@ public class SessionFactoryImplTest implements SessionFactory {
        throw new RuntimeException(e);
      }
      Properties prop = new Properties();
-     prop.put("url", "jdbc:hsqldb:file:./test/config/chord;create=false;shutdown=true;hsqldb.write_delay=false;hsqldb.sqllog=2;hsqldb.applog=3;");
+     prop.put("url", "jdbc:hsqldb:mem:/test");
      prop.put("user", "SA");
      prop.put("pass", "");
      

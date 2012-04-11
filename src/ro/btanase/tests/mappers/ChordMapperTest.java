@@ -36,6 +36,17 @@ public class ChordMapperTest {
   public static void setUpOnce() throws Exception {
     injector = Guice.createInjector(new ChordLearningModuleTest());
     sessionFactory = injector.getInstance(SessionFactory.class);
+    SqlSession session = sessionFactory.get().openSession();
+
+    String ddl = "ro/btanase/tests/scripts/dbddl.sql";    
+    Reader ddl_reader = Resources.getResourceAsReader(ddl);
+    
+    ScriptRunner scriptRunner = new ScriptRunner(session.getConnection());
+    
+    scriptRunner.runScript(ddl_reader);
+    session.commit();
+    session.close();
+    
   }  
 
   @Before
@@ -70,7 +81,7 @@ public class ChordMapperTest {
     
     List<Chord> chordList = mapper.selectAll();
     
-    assertEquals(25, chordList.size());
+    assertEquals(27, chordList.size());
     
     Chord chord = chordList.get(0);
     
@@ -86,17 +97,17 @@ public class ChordMapperTest {
     SqlSession session = sessionFactory.get().openSession();
     ChordMapper mapper = session.getMapper(ChordMapper.class);
     
-    Chord chord = new Chord("Test", "test.ima");
+    Chord chord = new Chord("Testx", "test.ima");
     
     mapper.insert(chord);
     
     int insertId = mapper.lastInsertId();
     
-    assertEquals(50, insertId);
+    assertEquals(59, insertId);
     session.commit();
     chord = mapper.selectById(insertId);
     
-    assertEquals("Test", chord.getChordName());
+    assertEquals("Testx", chord.getChordName());
     assertEquals("test.ima", chord.getFileName());
     
     session.close();

@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -30,6 +32,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 
 import ro.btanase.chordlearning.dao.ScoreDao;
+import ro.btanase.chordlearning.dao.SettingsDao;
 import ro.btanase.chordlearning.domain.Chord;
 import ro.btanase.chordlearning.domain.ExerciseResult;
 import ro.btanase.chordlearning.domain.Lesson;
@@ -39,8 +42,9 @@ import ro.btanase.mediaplayer.MediaPlayer;
 import ro.btanase.utils.ListUtils;
 
 import com.google.inject.Inject;
+import javax.swing.JToggleButton;
 
-public class LessonSSRFrame extends JDialog {
+public class LessonSSRFrame extends JDialog implements ActionListener {
   private JTextField tfLessonName;
   private JTextField tfProgress;
   private Lesson lesson;
@@ -60,12 +64,28 @@ public class LessonSSRFrame extends JDialog {
   private ScoreDao m_scores;
 
   @Inject
+  private SettingsDao settingsDao;
+
+  @Inject
   private MediaPlayer mediaPlayer;
+  /**
+   * this is set randomly from selected slots; it should
+     be reset on exercise start and if a slot button is changed
+   */
+  private int slotToPlay; 
+  
   private JScrollPane scrollPane;
   private JPanel panel_1;
   private JButton btnStop;
   private KeyboardFocusManager manager;
   private MyDispatcher dispatcher;
+  private JPanel panel_2;
+  private JToggleButton tglSlot1;
+  private JToggleButton tglSlot2;
+  private JToggleButton tglSlot3;
+  private JToggleButton tglSlot4;
+  private JToggleButton tglSlot5;
+  private JPanel panel_3;
 
   /**
    * Create the dialog.
@@ -82,26 +102,56 @@ public class LessonSSRFrame extends JDialog {
     this.lesson = lesson;
     setTitle("Chord recognition");
     setBounds(100, 100, 774, 351);
-    getContentPane().setLayout(new MigLayout("", "[grow][grow]", "[][][][grow]"));
+    getContentPane().setLayout(new MigLayout("", "[][grow][grow][]", "[][][][grow]"));
+    
+    panel_2 = new JPanel();
+    panel_2.setBorder(new TitledBorder(null, "Sound sources", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    getContentPane().add(panel_2, "cell 0 0 1 2,grow");
+    panel_2.setLayout(new MigLayout("", "[][][][][]", "[]"));
+    
+    tglSlot1 = new JToggleButton("Slot 1");
+    panel_2.add(tglSlot1, "cell 0 0");
+    
+    tglSlot2 = new JToggleButton("Slot 2");
+    panel_2.add(tglSlot2, "cell 1 0");
+    
+    tglSlot3 = new JToggleButton("Slot 3");
+    panel_2.add(tglSlot3, "cell 2 0");
+    
+    tglSlot4 = new JToggleButton("Slot 4");
+    panel_2.add(tglSlot4, "cell 3 0");
+    
+    tglSlot5 = new JToggleButton("Slot 5");
+    panel_2.add(tglSlot5, "cell 4 0");
+    
+    tglSlot1.addActionListener(this);
+    tglSlot2.addActionListener(this);
+    tglSlot3.addActionListener(this);
+    tglSlot4.addActionListener(this);
+    tglSlot5.addActionListener(this);
+    
+    panel_3 = new JPanel();
+    getContentPane().add(panel_3, "cell 1 0 3 2,grow");
+    panel_3.setLayout(new MigLayout("", "[][grow,fill]", "[][]"));
 
     JLabel lblLessonName = new JLabel("Lesson name:");
-    getContentPane().add(lblLessonName, "cell 0 0,alignx trailing");
+    panel_3.add(lblLessonName, "cell 0 0");
 
     tfLessonName = new JTextField();
+    panel_3.add(tfLessonName, "cell 1 0,growx");
     tfLessonName.setEditable(false);
-    getContentPane().add(tfLessonName, "cell 1 0");
     // tfLessonName.setColumns(10);
 
     JLabel lblLessonProgress = new JLabel("Lesson Progress:");
-    getContentPane().add(lblLessonProgress, "cell 0 1,alignx trailing");
+    panel_3.add(lblLessonProgress, "cell 0 1");
 
     tfProgress = new JTextField();
+    panel_3.add(tfProgress, "cell 1 1,growx");
     tfProgress.setText("1/5");
     tfProgress.setEditable(false);
-    getContentPane().add(tfProgress, "flowx,cell 1 1,alignx left");
 
     panel_1 = new JPanel();
-    getContentPane().add(panel_1, "cell 0 2 2 1,grow");
+    getContentPane().add(panel_1, "cell 0 2 4 1,grow");
     panel_1.setLayout(new MigLayout("", "[58px,grow][grow]", "[26px]"));
 
     btnPlay = new JButton("Play");
@@ -125,7 +175,7 @@ public class LessonSSRFrame extends JDialog {
     });
 
     scrollPane = new JScrollPane();
-    getContentPane().add(scrollPane, "cell 0 3 2 1,grow");
+    getContentPane().add(scrollPane, "cell 0 3 4 1,grow");
 
     JPanel panel = new JPanel();
     scrollPane.setViewportView(panel);
@@ -196,10 +246,32 @@ public class LessonSSRFrame extends JDialog {
     // mediaPlayer.stopPlayback();
     // }
 
+    List<Integer> selectedSlots = getSelectedSlots();
+    
+    if (selectedSlots.isEmpty()){
+      JOptionPane.showMessageDialog(LessonSSRFrame.this, "You must select at least one sound source",
+            "No samples selected", JOptionPane.WARNING_MESSAGE);
+      return;
+    }
+    
     mediaPlayer.stopPlayback();
 
+    String methodName = "";
+    String fileToPlay = "";
+    if (slotToPlay == 0){
+      methodName = "getFileName";
+    } else {
+      methodName = "getFileName" + (slotToPlay + 1);
+    }
+    try {
+      Method method = activeChord.getClass().getMethod(methodName, null); 
+      fileToPlay = (String) method.invoke(activeChord, null);
+    }catch (Exception e) {
+      log.error("Reflection failure", e);
+      throw new RuntimeException(e);
+    }
     
-    mediaPlayer.playImaFile(activeChord.getFileName(), new IMPCallback() {
+    mediaPlayer.playImaFile(fileToPlay, new IMPCallback() {
 
       @Override
       public void onStop() {
@@ -210,7 +282,7 @@ public class LessonSSRFrame extends JDialog {
       public void onPlay() {
 
       }
-    }, 0);
+    });
 
   }
 
@@ -235,6 +307,7 @@ public class LessonSSRFrame extends JDialog {
     btnNextExercise.setVisible(false);
     setEnabledAllbuttons(true);
     exerciseFailed = false;
+    randomizeSlot();
   }
 
   private void generateAnswerButtons() {
@@ -399,4 +472,97 @@ public class LessonSSRFrame extends JDialog {
 
   }
 
+  @Inject
+  private void postConstruct(){
+    setToggleButtonsNames();
+    checkSamplesAvailability();
+  }
+
+  private void setToggleButtonsNames() {
+    String[] slots = settingsDao.getSlots();
+    
+    tglSlot1.setText(slots[0]);
+    tglSlot2.setText(slots[1]);
+    tglSlot3.setText(slots[2]);
+    tglSlot4.setText(slots[3]);
+    tglSlot5.setText(slots[4]);
+  }
+  
+  private void checkSamplesAvailability(){
+    List<Chord> chordList = lesson.getChordSequence();
+    
+    for (Chord chord : chordList) {
+      if (chord.getFileName() == null){
+        tglSlot1.setEnabled(false);
+      }
+      
+      if (chord.getFileName2() == null){
+        tglSlot2.setEnabled(false);
+      }
+      if (chord.getFileName3() == null){
+        tglSlot3.setEnabled(false);
+      }
+      if (chord.getFileName4() == null){
+        tglSlot4.setEnabled(false);
+      }
+      if (chord.getFileName5() == null){
+        tglSlot5.setEnabled(false);
+      }
+    }
+    
+    if (tglSlot1.isEnabled()){
+      tglSlot1.setSelected(true);
+    }else if (tglSlot2.isEnabled()){
+      tglSlot2.setSelected(true);
+    }else if (tglSlot3.isEnabled()){
+      tglSlot3.setSelected(true);
+    }else if (tglSlot4.isEnabled()){
+      tglSlot4.setSelected(true);
+    }else if (tglSlot5.isEnabled()){
+      tglSlot5.setSelected(true);
+    }
+  }
+  
+  private List<Integer> getSelectedSlots(){
+    List<Integer> selectedSlots = new ArrayList<Integer>();
+    
+    if (tglSlot1.isSelected()){
+      selectedSlots.add(0);
+    }
+    if (tglSlot2.isSelected()){
+      selectedSlots.add(1);
+    }
+    if (tglSlot3.isSelected()){
+      selectedSlots.add(2);
+    }
+    if (tglSlot4.isSelected()){
+      selectedSlots.add(3);
+    }
+    if (tglSlot5.isSelected()){
+      selectedSlots.add(4);
+    }
+    
+    return selectedSlots;
+    
+  }
+  
+  private void randomizeSlot(){
+    if (!getSelectedSlots().isEmpty()){
+      List<Integer> selectedSlots = getSelectedSlots();
+      Collections.shuffle(selectedSlots);
+      slotToPlay = selectedSlots.get(0);    
+    }
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent evt) {
+    Object source = evt.getSource();
+    
+    // If any button is pressed select a different slot to play
+    if (source == tglSlot1 || source == tglSlot2 || source == tglSlot3 ||
+        source == tglSlot4 || source == tglSlot5){
+      randomizeSlot();
+    }
+    
+  }
 }

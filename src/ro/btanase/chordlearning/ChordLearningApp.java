@@ -3,6 +3,9 @@ package ro.btanase.chordlearning;
 import java.awt.EventQueue;
 import java.io.File;
 
+import javax.management.RuntimeErrorException;
+import javax.swing.UIManager;
+
 import org.apache.log4j.Logger;
 
 import ro.btanase.chordlearning.exceptions.MyUncaughtExceptionHandler;
@@ -17,9 +20,9 @@ import com.google.inject.Injector;
 public class ChordLearningApp {
   private static Logger log = Logger.getLogger(ChordLearningApp.class);
   private static Injector injector;
-  public static final double CONFIG_FILE_CHORDS_VERSION = 1.0;
-  public static final double CONFIG_FILE_LESSON_VERSION = 1.1;
-  public static final String VERSION = "0.4.0/470";
+//  public static final double CONFIG_FILE_CHORDS_VERSION = 1.0;
+//  public static final double CONFIG_FILE_LESSON_VERSION = 1.1;
+  public static final String VERSION = "1.0.0";
   public static final String CONFIG_FOLDER = "config";
   
   /**
@@ -31,7 +34,7 @@ public class ChordLearningApp {
     MyUncaughtExceptionHandler.registerExceptionHandler();
     
     if (args.length == 1 && args[0].equals("-c")){
-      File file = new File(System.getProperty("user.home") + File.separator + ".gcet" + File.separator + "application.properties");
+      File file = new File(System.getProperty("user.home") + File.separator + UserData.DATA_DIR + File.separator + "application.properties");
       if (file.exists()){
         if (!file.delete()){
           throw new RuntimeException("Unable to delete configuration file: " + file.getAbsolutePath());
@@ -43,6 +46,13 @@ public class ChordLearningApp {
       
       @Override
       public void run() {
+        try {
+          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Throwable e) {
+          log.error("unable to set look and feel", e);
+          throw new RuntimeException(e);
+        }
+
         injector = Guice.createInjector(new ChordLearningModule());
         initUserData();
         ApplicationMainWindow ldf = injector.getInstance(ApplicationMainWindow.class);

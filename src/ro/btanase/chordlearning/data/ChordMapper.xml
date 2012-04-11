@@ -7,7 +7,11 @@
 		SELECT 
 			C_ID AS id,
 			C_NAME AS chordName,
-			C_FILENAME AS fileName
+			C_FILENAME AS fileName,
+			C_FILENAME2 AS fileName2,
+			C_FILENAME3 AS fileName3,
+			C_FILENAME4 AS fileName4,
+			C_FILENAME5 AS fileName5
 		FROM chord
 	</select>
 
@@ -15,7 +19,11 @@
 		SELECT 
 			C_ID AS id,
 			C_NAME AS chordName,
-			C_FILENAME AS fileName
+			C_FILENAME AS fileName,
+      C_FILENAME2 AS fileName2,
+      C_FILENAME3 AS fileName3,
+      C_FILENAME4 AS fileName4,
+      C_FILENAME5 AS fileName5
 		FROM chord
 		WHERE
 			C_ID = #{id}
@@ -24,9 +32,9 @@
 	<insert id="insert" parameterType="ro.btanase.chordlearning.domain.Chord"
 			keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO chord
-			(C_NAME, C_FILENAME)
+			(C_NAME, C_FILENAME, C_FILENAME2, C_FILENAME3, C_FILENAME4, C_FILENAME5)
 		VALUES
-			(#{chordName}, #{fileName})	
+			(#{chordName}, #{fileName}, #{fileName2}, #{fileName3}, #{fileName4}, #{fileName5})	
 	</insert>
 	
 	<select id="lastInsertId" resultType="int">
@@ -37,7 +45,11 @@
 		UPDATE chord 
 		SET 
 			C_NAME = #{chordName},
-			C_FILENAME = #{fileName}
+			C_FILENAME = #{fileName},
+			C_FILENAME2 = #{fileName2},
+			C_FILENAME3 = #{fileName3},
+			C_FILENAME4 = #{fileName4},
+			C_FILENAME5 = #{fileName5}
 		WHERE
 			C_ID = #{id}
 	</update>

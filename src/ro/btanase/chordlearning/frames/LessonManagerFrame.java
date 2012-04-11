@@ -62,6 +62,7 @@ public class LessonManagerFrame extends JDialog{
     scrollPane.setViewportView(jlistLessons);
     
     btnNewLesson = new JButton("New Lesson");
+    btnNewLesson.setMnemonic('n');
     btnNewLesson.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnNewLessonActionPerformed();
@@ -70,6 +71,7 @@ public class LessonManagerFrame extends JDialog{
     contentPane.add(btnNewLesson, "cell 1 3,growx");
     
     btnEditLesson = new JButton("Edit Lesson");
+    btnEditLesson.setMnemonic('e');
     btnEditLesson.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnEditLessonActionPerformed();
@@ -78,6 +80,7 @@ public class LessonManagerFrame extends JDialog{
     contentPane.add(btnEditLesson, "cell 1 4,growx");
     
     btnRemoveLesson = new JButton("Remove Lesson");
+    btnRemoveLesson.setMnemonic('r');
     btnRemoveLesson.addActionListener(new ActionListener() {
       
       @Override
@@ -89,6 +92,7 @@ public class LessonManagerFrame extends JDialog{
     contentPane.add(btnRemoveLesson, "cell 1 5,growx");
     
     btnMoveUp = new JButton("Move Up");
+    btnMoveUp.setMnemonic('u');
     btnMoveUp.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnMoveupActionPerformed();
@@ -97,6 +101,7 @@ public class LessonManagerFrame extends JDialog{
     contentPane.add(btnMoveUp, "cell 1 7,growx");
     
     btnMovedown = new JButton("MoveDown");
+    btnMovedown.setMnemonic('d');
     btnMovedown.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnMovedownActionPerformed();
@@ -138,12 +143,18 @@ public class LessonManagerFrame extends JDialog{
   private void onBtnRemoveLessonActionPerformed() {
     if (jlistLessons.getSelectedValue() != null){
       Lesson lesson = (Lesson) jlistLessons.getSelectedValue();
+      int oldSelection = jlistLessons.getSelectedIndex();
       int result = JOptionPane.showConfirmDialog(this, "Are you sure you wish to delete lesson "
           + lesson.getLessonName() + "? ", "Delete lesson?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
       
       if (JOptionPane.YES_OPTION == result){
         m_lessons.deleteLesson(lesson);
         jlistLessons.clearSelection();
+        if (oldSelection > 0){
+          oldSelection--;
+          jlistLessons.setSelectedIndex(oldSelection);
+        }
+        
       }
     }
     

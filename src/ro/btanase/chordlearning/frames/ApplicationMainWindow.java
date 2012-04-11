@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URI;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -22,6 +23,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
@@ -37,6 +40,8 @@ import ca.odell.glazedlists.swing.EventListModel;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
 public class ApplicationMainWindow extends JFrame {
 
@@ -46,17 +51,17 @@ public class ApplicationMainWindow extends JFrame {
   private JButton btnStartTest;
   private JMenuBar menuBar;
   private JMenu mnStatistics;
-  private JMenuItem mntmNewMenuItem;
-  private JMenuItem mntmNewMenuItem_1;
-  private JMenu mnNewMenu;
-  private JMenuItem mntmNewMenuItem_2;
-  private JMenuItem mntmNewMenuItem_3;
-  private JMenu mnNewMenu_1;
-  private JMenuItem mntmNewMenuItem_4;
-  private JMenuItem mntmNewMenuItem_5;
+  private JMenuItem menuItemChordAccuracy;
+  private JMenuItem menuItemLessonEvolution;
+  private JMenu mnConfiguration;
+  private JMenuItem menuItemChordManager;
+  private JMenuItem menuItemLessonManager;
+  private JMenu mnHelp;
+  private JMenuItem menuItemHelp;
+  private JMenuItem menuItemAbout;
   private JTextPane txtpnToStartTraining;
   private static Logger log = Logger.getLogger(ApplicationMainWindow.class);
-  private JMenuItem mntmNewMenuItem_6;
+  private JMenuItem menuItemScoreReset;
 
 
   /**
@@ -79,59 +84,68 @@ public class ApplicationMainWindow extends JFrame {
     setJMenuBar(menuBar);
     
     mnStatistics = new JMenu("Statistics");
+    mnStatistics.setMnemonic('s');
     mnStatistics.setIcon(null);
     menuBar.add(mnStatistics);
     
-    mntmNewMenuItem = new JMenuItem("Chord Accuracy ...");
-    mntmNewMenuItem.addActionListener(new ActionListener() {
+    menuItemChordAccuracy = new JMenuItem("Chord Accuracy ...");
+    menuItemChordAccuracy.setMnemonic('c');
+    menuItemChordAccuracy.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         showChordAccuracy();
       }
     });
-    mntmNewMenuItem.setIcon(null);
-    mnStatistics.add(mntmNewMenuItem);
+    menuItemChordAccuracy.setIcon(null);
+    mnStatistics.add(menuItemChordAccuracy);
     
-    mntmNewMenuItem_1 = new JMenuItem("Lesson Evolution Chart ...");
-    mntmNewMenuItem_1.addActionListener(new ActionListener() {
+    menuItemLessonEvolution = new JMenuItem("Lesson Evolution Chart ...");
+    menuItemLessonEvolution.setMnemonic('l');
+    menuItemLessonEvolution.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         showEvolutionChart();
       }
     });
-    mntmNewMenuItem_1.setIcon(null);
-    mnStatistics.add(mntmNewMenuItem_1);
+    menuItemLessonEvolution.setIcon(null);
+    mnStatistics.add(menuItemLessonEvolution);
     
-    mnNewMenu = new JMenu("Configuration");
-    menuBar.add(mnNewMenu);
+    mnConfiguration = new JMenu("Configuration");
+    mnConfiguration.setMnemonic('c');
+    menuBar.add(mnConfiguration);
     
-    mntmNewMenuItem_2 = new JMenuItem("Manage Chord Samples ...");
-    mntmNewMenuItem_2.addActionListener(new ActionListener() {
+    menuItemChordManager = new JMenuItem("Manage Chord Samples ...");
+    menuItemChordManager.setMnemonic('s');
+    menuItemChordManager.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         showChordManager();
       }
     });
-    mnNewMenu.add(mntmNewMenuItem_2);
+    mnConfiguration.add(menuItemChordManager);
     
-    mntmNewMenuItem_3 = new JMenuItem("Manage Lessons ...");
-    mntmNewMenuItem_3.addActionListener(new ActionListener() {
+    menuItemLessonManager = new JMenuItem("Manage Lessons ...");
+    menuItemLessonManager.setMnemonic('l');
+    menuItemLessonManager.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         showLessonManager();
       }
     });
-    mnNewMenu.add(mntmNewMenuItem_3);
+    mnConfiguration.add(menuItemLessonManager);
     
-    mntmNewMenuItem_6 = new JMenuItem("Reset Scores!");
-    mntmNewMenuItem_6.addActionListener(new ActionListener() {
+    menuItemScoreReset = new JMenuItem("Reset Scores!");
+    menuItemScoreReset.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         resetScores();
       }
     });
-    mnNewMenu.add(mntmNewMenuItem_6);
+    mnConfiguration.add(menuItemScoreReset);
     
-    mnNewMenu_1 = new JMenu("Help");
-    menuBar.add(mnNewMenu_1);
+    mnHelp = new JMenu("Help");
+    mnHelp.setMnemonic('h');
+    menuBar.add(mnHelp);
     
-    mntmNewMenuItem_4 = new JMenuItem("Online Help (opens browser)");
-    mntmNewMenuItem_4.addActionListener(new ActionListener() {
+    menuItemHelp = new JMenuItem("Online Help (opens browser)");
+    menuItemHelp.setMnemonic('h');
+    menuItemHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+    menuItemHelp.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         try{
           URI uri = new URI("http://chords.btanase.ro/index.php/page/documentation");
@@ -143,15 +157,16 @@ public class ApplicationMainWindow extends JFrame {
         }
       }
     });
-    mnNewMenu_1.add(mntmNewMenuItem_4);
+    mnHelp.add(menuItemHelp);
     
-    mntmNewMenuItem_5 = new JMenuItem("About ...");
-    mntmNewMenuItem_5.addActionListener(new ActionListener() {
+    menuItemAbout = new JMenuItem("About ...");
+    menuItemAbout.setMnemonic('a');
+    menuItemAbout.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         showAboutWindow();
       }
     });
-    mnNewMenu_1.add(mntmNewMenuItem_5);
+    mnHelp.add(menuItemAbout);
     contentPane = new JPanel();
     contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
     setContentPane(contentPane);
@@ -160,6 +175,9 @@ public class ApplicationMainWindow extends JFrame {
     txtpnToStartTraining = new JTextPane();
     txtpnToStartTraining.setEditable(false);
     txtpnToStartTraining.setText("To start training select a lesson below and click Go\r\nDon't forget that you can (and I highly recommend to) create your own lessons!\r\nJust go to the menu above: Configuration -> Manage Lessons");
+    Border border = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+
+    txtpnToStartTraining.setBorder(UIManager.getBorder("Button.border"));
     contentPane.add(txtpnToStartTraining, "cell 0 0,grow");
     
     btnStartTest = new JButton("Go!");

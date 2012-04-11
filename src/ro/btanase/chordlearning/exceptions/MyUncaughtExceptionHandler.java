@@ -9,6 +9,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+import ro.btanase.chordlearning.services.UserData;
+
 public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler{
   private static Logger log = Logger.getLogger(MyUncaughtExceptionHandler.class);
 
@@ -25,7 +27,7 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler{
 
   private void displayErrorMessage(String message){
     try {
-      String userHomePath = System.getProperty("user.home") + File.separator + ".gcet";
+      String userHomePath = System.getProperty("user.home") + File.separator + UserData.DATA_DIR;
       System.getProperties().store(new FileOutputStream(userHomePath + File.separator + "systeminfo.log"), "system information");
     } catch (IOException e) {
       log.fatal("Error saving system info", e);

@@ -45,7 +45,7 @@ public class MediaPlayer {
     format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, (16 / 8) * 2, 44100, false);
   }
 
-  public void playImaFile(String fileName, final IMPCallback callback, int slot) {
+  public void playImaFile(String fileName, final IMPCallback callback) {
     final File file = new File(userData.getMediaFolder() + File.separator + fileName);
 
     Thread thread = new Thread(new Runnable() {

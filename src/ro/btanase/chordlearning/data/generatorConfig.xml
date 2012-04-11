@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+  <classPathEntry location="d:/java/lib/hsqldb-2.2.4/hsqldb/lib/hsqldb.jar"/>
+  <context id="context1" >
+    <jdbcConnection driverClass="org.hsqldb.jdbc.JDBCDriver" connectionURL="jdbc:hsqldb:file:c:\Documents and Settings\b.tanase\.gcet\test\config\chord" userId="SA" password="" />
+    <javaModelGenerator targetPackage="ro.btanase.chordlearning.mybatisgen.model" targetProject="ChordLearning/src" />
+    <sqlMapGenerator targetPackage="ro.btanase.chordlearning.mybatisgen.mapper" targetProject="ChordLearning/src" />
+    <javaClientGenerator targetPackage="ro.btanase.chordlearning.mybatisgen.client" targetProject="ChordLearning/src" type="XMLMAPPER" />
+    <table schema="PUBLIC" tableName="SETTINGS" >
+      <generatedKey column="S_ID" sqlStatement="JDBC"/>    
+      <columnOverride column="S_ID" property="id" />
+      <columnOverride column="S_KEY" property="key" />
+      <columnOverride column="S_VALUE" property="value" />
+    </table>
+  </context>
+</generatorConfiguration>

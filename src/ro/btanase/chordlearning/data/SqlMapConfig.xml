@@ -11,6 +11,7 @@
 		<typeAlias alias="ExerciseResult" type="ro.btanase.chordlearning.domain.ExerciseResult" />
 		<typeAlias alias="ChordAccuracyWrapper" type="ro.btanase.chordlearning.domain.wrappers.ChordAccuracyWrapper" />
 		<typeAlias alias="LessonEvolutionWrapper" type="ro.btanase.chordlearning.domain.wrappers.LessonEvolutionWrapper" />
+		<typeAlias alias="Settings" type="ro.btanase.chordlearning.mybatisgen.model.Settings" />
 	</typeAliases>
 
 	<environments default="development">
@@ -30,6 +31,7 @@
 		<mapper resource="ro/btanase/chordlearning/data/ChordMapper.xml"/>
 		<mapper resource="ro/btanase/chordlearning/data/LessonMapper.xml"/>
 		<mapper resource="ro/btanase/chordlearning/data/ScoreMapper.xml"/>
+		<mapper resource="ro/btanase/chordlearning/mybatisgen/mapper/SettingsMapper.xml"/>
 	</mappers>
 	
 

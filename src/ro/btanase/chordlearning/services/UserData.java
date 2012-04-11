@@ -13,6 +13,10 @@ public interface UserData {
    */
   public final String CONFIG_FOLDER = "config";
 
+  /**
+   * where application.properties & logs are stored. Also the default parent folder for config and media
+   */
+  public final String DATA_DIR = ".gcet2";
   
   
   /**

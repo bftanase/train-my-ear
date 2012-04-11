@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 
 import ro.btanase.chordlearning.ChordLearningApp;
 import ro.btanase.chordlearning.dao.ChordDao;
+import ro.btanase.chordlearning.dao.SettingsDao;
 import ro.btanase.chordlearning.domain.Chord;
 import ro.btanase.chordlearning.exceptions.ConstraintException;
 import ro.btanase.chordlearning.services.UserData;
@@ -33,6 +34,10 @@ import ro.btanase.utils.FileUtils;
 import ca.odell.glazedlists.swing.EventListModel;
 
 import com.google.inject.Inject;
+import javax.swing.border.TitledBorder;
+import javax.swing.JRadioButton;
+import javax.swing.JComboBox;
+import javax.swing.ButtonGroup;
 
 public class ChordManagerFrame extends JDialog {
 
@@ -46,6 +51,16 @@ public class ChordManagerFrame extends JDialog {
   private MediaPlayer mediaPlayer;
   @Inject
   private UserData userData;
+  
+  @Inject
+  private SettingsDao settingsDao;
+  
+  private final ButtonGroup buttonGroup = new ButtonGroup();
+  private JRadioButton rbSlot1;
+  private JRadioButton rbSlot2;
+  private JRadioButton rbSlot3;
+  private JRadioButton rbSlot4;
+  private JRadioButton rbSlot5;
 
   /**
    * Create the frame.
@@ -60,18 +75,19 @@ public class ChordManagerFrame extends JDialog {
     contentPane = new JPanel();
     contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
     setContentPane(contentPane);
-    contentPane.setLayout(new MigLayout("", "[grow][120px:120px:120px,fill]", "[][][][][19.00][][grow]"));
+    contentPane.setLayout(new MigLayout("", "[200.00,grow][120px:120px:180px,grow,fill]", "[][][][][][grow]"));
 
     JLabel lblExistingChords = new JLabel("Existing Chords:");
     contentPane.add(lblExistingChords, "cell 0 0");
 
     JScrollPane scrollPane = new JScrollPane();
-    contentPane.add(scrollPane, "cell 0 1 1 6,grow");
+    contentPane.add(scrollPane, "cell 0 1 1 5,grow");
 
     jlistChords = new JList();
     scrollPane.setViewportView(jlistChords);
 
     JButton btnNewChord = new JButton("New Chord ...");
+    btnNewChord.setMnemonic('n');
     btnNewChord.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnNewActionPerformed();
@@ -81,6 +97,7 @@ public class ChordManagerFrame extends JDialog {
     contentPane.add(btnNewChord, "cell 1 1,growx");
 
     JButton btnEditChord = new JButton("Edit Chord ...");
+    btnEditChord.setMnemonic('e');
     btnEditChord.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnEditChordActionPerformed();
@@ -89,6 +106,7 @@ public class ChordManagerFrame extends JDialog {
     contentPane.add(btnEditChord, "cell 1 2,growx");
 
     JButton btnDeleteChord = new JButton("Delete Chord");
+    btnDeleteChord.setMnemonic('d');
     btnDeleteChord.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnDeleteChordActionPerformed();
@@ -96,13 +114,40 @@ public class ChordManagerFrame extends JDialog {
     });
     contentPane.add(btnDeleteChord, "cell 1 3,growx");
 
+    JPanel panel = new JPanel();
+    panel.setBorder(new TitledBorder(null, "Test Samples", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    contentPane.add(panel, "cell 1 4,grow");
+    panel.setLayout(new MigLayout("", "[grow,fill]", "[][][][][][]"));
+
+    rbSlot1 = new JRadioButton("Slot 1");
+    rbSlot1.setSelected(true);
+    buttonGroup.add(rbSlot1);
+    panel.add(rbSlot1, "cell 0 0,growx");
+
+    rbSlot2 = new JRadioButton("Slot 2");
+    buttonGroup.add(rbSlot2);
+    panel.add(rbSlot2, "cell 0 1");
+
+    rbSlot3 = new JRadioButton("Slot 3");
+    buttonGroup.add(rbSlot3);
+    panel.add(rbSlot3, "cell 0 2");
+
+    rbSlot4 = new JRadioButton("Slot 4");
+    buttonGroup.add(rbSlot4);
+    panel.add(rbSlot4, "cell 0 3");
+
+    rbSlot5 = new JRadioButton("Slot 5");
+    buttonGroup.add(rbSlot5);
+    panel.add(rbSlot5, "cell 0 4");
+
     btnPlayChord = new JButton("Play Chord");
+    btnPlayChord.setMnemonic('p');
+    panel.add(btnPlayChord, "cell 0 5,growx");
     btnPlayChord.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnPlayChordActionPerformed();
       }
     });
-    contentPane.add(btnPlayChord, "cell 1 5,growx");
 
     initModels();
   }
@@ -143,7 +188,6 @@ public class ChordManagerFrame extends JDialog {
         m_chords.updateChord(chord);
       }
 
-
       @Override
       public void onCancel(Chord object) {
         // TODO Auto-generated method stub
@@ -164,8 +208,15 @@ public class ChordManagerFrame extends JDialog {
           JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
       if (JOptionPane.YES_OPTION == result) {
+        int oldSelection = jlistChords.getSelectedIndex();
+        
         try {
           m_chords.deleteChord(chord);
+          
+          if (oldSelection > 0){
+            oldSelection--;
+            jlistChords.setSelectedIndex(oldSelection);
+          }
         } catch (ConstraintException e) {
           JOptionPane.showMessageDialog(this, "Cannot delete this chord. It is used in other lessons",
               "Error deleting chord", JOptionPane.WARNING_MESSAGE);
@@ -184,7 +235,17 @@ public class ChordManagerFrame extends JDialog {
     log.debug("Entering play event...");
     if (btnPlayChord.getText().startsWith("Play")) {
       log.debug("Play path chosen - button name is Play...");
-      mediaPlayer.playImaFile(chord.getFileName(), new IMPCallback() {
+
+      String fileName = invokeGetFileNameForSlot(chord, getActiveSlot());
+
+      if (fileName == null){
+        JOptionPane.showMessageDialog(ChordManagerFrame.this, "This slot is empty. Nothing to play",
+            "Slot empty",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      
+      mediaPlayer.playImaFile(fileName, new IMPCallback() {
 
         @Override
         public void onStop() {
@@ -207,7 +268,7 @@ public class ChordManagerFrame extends JDialog {
             }
           });
         }
-      }, 0);
+      });
     } else {
       System.out.println("stopping ...");
       mediaPlayer.stopPlayback();
@@ -241,9 +302,7 @@ public class ChordManagerFrame extends JDialog {
         // TODO Auto-generated method stub
 
       }
-      
-      
-      
+
     });
 
     ChordLearningApp.getInjector().injectMembers(addChordDialog);
@@ -312,6 +371,56 @@ public class ChordManagerFrame extends JDialog {
     setFileNameMethod.invoke(chord, fileName); // this is equivalent to
                                                // chord.setFileName#(fileName)
   }
-  
-  
+
+  private int getActiveSlot() {
+    if (rbSlot1.isSelected()) {
+      return 0;
+    } else if (rbSlot2.isSelected()) {
+      return 1;
+    } else if (rbSlot3.isSelected()) {
+      return 2;
+    } else if (rbSlot4.isSelected()) {
+      return 3;
+    } else if (rbSlot5.isSelected()) {
+      return 4;
+    } else {
+      throw new IllegalStateException("Invalid selection on slot radio buttons");
+    }
+  }
+
+  private String invokeGetFileNameForSlot(Chord chord, int slot) {
+    
+    String result = "";
+    String getFileNameMethodName = "";
+    if (slot == 0) {
+      getFileNameMethodName = "getFileName";
+    } else {
+      getFileNameMethodName = "getFileName" + (slot + 1);
+    }
+    try {
+      
+      log.debug("attempting to bulid Chord method: " + getFileNameMethodName);
+      Method getFileNameMethod = chord.getClass().getMethod(getFileNameMethodName);
+
+      result = (String) getFileNameMethod.invoke(chord); 
+    } catch (Exception e) {
+      log.error("reflection failure", e);
+      throw new RuntimeException(e);
+    }
+    
+    return result;
+  }
+
+  @Inject // == @PostConstruct
+  private void postConstruct(){
+    setSlotNames(settingsDao.getSlots());
+  }
+
+  private void setSlotNames(String[] slots) {
+    rbSlot1.setText(slots[0]);
+    rbSlot2.setText(slots[1]);
+    rbSlot3.setText(slots[2]);
+    rbSlot4.setText(slots[3]);
+    rbSlot5.setText(slots[4]);
+  }
 }

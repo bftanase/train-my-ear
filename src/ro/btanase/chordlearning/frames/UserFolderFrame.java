@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -22,6 +23,8 @@ import org.apache.log4j.Logger;
 import ro.btanase.chordlearning.services.UserData;
 
 import com.google.inject.Inject;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.BevelBorder;
 
 public class UserFolderFrame extends JDialog {
   private JTextField tfApplicationData;
@@ -43,6 +46,7 @@ public class UserFolderFrame extends JDialog {
     getContentPane().setLayout(new MigLayout("", "[][][grow][]", "[][grow][][]"));
     
     JTextPane textPane = new JTextPane();
+    textPane.setBorder(UIManager.getBorder("Button.border"));
     textPane.setBackground(UIManager.getColor("Button.background"));
     textPane.setContentType("text/html");
     textPane.setEditable(false);
@@ -68,7 +72,7 @@ public class UserFolderFrame extends JDialog {
     JButton btnIDontCare = new JButton("I don't care, use defaults");
     btnIDontCare.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        String defaultUserDir = System.getProperty("user.home") + File.separator + ".gcet" + File.separator + "application_data";
+        String defaultUserDir = System.getProperty("user.home") + File.separator + UserData.DATA_DIR + File.separator + "application_data";
         tfApplicationData.setText(defaultUserDir);
         btnContinueActionPerformed();
         UserFolderFrame.this.dispose();
@@ -146,7 +150,7 @@ public class UserFolderFrame extends JDialog {
     if (userData.getUserFolder() == null){
       
       String userHome = System.getProperty("user.home");
-      userData.setUserFolder(userHome + File.separator + ".gcet" + File.separator + "application_data");
+      userData.setUserFolder(userHome + File.separator + UserData.DATA_DIR + File.separator + "application_data");
     }
     
     tfApplicationData.setText(userData.getUserFolder());

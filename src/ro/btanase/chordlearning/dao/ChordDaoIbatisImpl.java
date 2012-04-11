@@ -1,6 +1,7 @@
 package ro.btanase.chordlearning.dao;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -85,13 +86,31 @@ public class ChordDaoIbatisImpl implements ChordDao {
 
       // delete file
       mediaPlayer.stopPlayback();
-      String fileName = userData.getMediaFolder() + File.separator
-          + chord.getFileName();
-      log.debug("Trying to delete file: " + fileName);
-      File file = new File(fileName);
+      
+      for (int i=0; i < MediaPlayer.NO_SLOTS; i++){
+        String fileName;
+        
+        if (i == 0){
+          fileName = chord.getFileName();
+        } else {
+          Method method = chord.getClass().getMethod("getFileName" + (i+1), null);
+          try {
+            fileName = (String) method.invoke(chord, null);
+          } catch (Exception e) {
+            log.error("Reflection failure", e);
+            throw new RuntimeException(e);
+          }
+        }
+        
+        if (fileName != null){
+          String fullpath = userData.getMediaFolder() + File.separator + fileName;
+          log.debug("Trying to delete file: " + fullpath);
+          File file = new File(fullpath);
 
-      if (!file.delete()) {
-        throw new RuntimeException("Cannot delete file: " + chord.getFileName());
+          if (!file.delete()) {
+            throw new RuntimeException("Cannot delete file: " + chord.getFileName());
+          }
+        }
       }
 
       chordList.remove(chord);
@@ -119,6 +138,7 @@ public class ChordDaoIbatisImpl implements ChordDao {
       mapper.update(chord);
       
       chordList.set(chordList.indexOf(chord), chord);
+      session.commit();
     }finally{
       session.close();
     }

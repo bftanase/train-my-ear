@@ -15,6 +15,8 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 
 import org.apache.log4j.Logger;
@@ -111,8 +113,23 @@ public class SequencePlayer {
   public void play() {
     log.debug("Playlist: " + playList.toString());
     clip.stop();
+    clip.drain();
+    
+//    LineListener listener = new LineListener() {
+//      
+//      @Override
+//      public void update(LineEvent event) {
+//        if (event.getType().equals(LineEvent.Type.STOP)){
+//          clip.setFramePosition(0);
+//          clip.start();
+//          clip.removeLineListener(this);
+//        }
+//      }
+//    };
+//    clip.addLineListener(listener);
     clip.setFramePosition(0);
     clip.start();
+    
   }
 
   public synchronized void stop() {

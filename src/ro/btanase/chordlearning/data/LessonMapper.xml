@@ -64,7 +64,11 @@
 			SELECT 
 			  CHORD.C_ID AS id, 
 			  CHORD.C_NAME AS chordName, 
-			  CHORD.C_FILENAME AS fileName 
+			  CHORD.C_FILENAME AS fileName, 
+			  CHORD.C_FILENAME2 AS fileName2, 
+			  CHORD.C_FILENAME3 AS fileName3, 
+			  CHORD.C_FILENAME4 AS fileName4, 
+			  CHORD.C_FILENAME5 AS fileName5 
 			FROM
 			  LESSON_CHORD 
 			  JOIN CHORD 
