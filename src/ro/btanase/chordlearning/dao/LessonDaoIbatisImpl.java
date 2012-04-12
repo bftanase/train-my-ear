@@ -71,7 +71,10 @@ public class LessonDaoIbatisImpl implements LessonDao {
     try {
       LessonMapper mapper = session.getMapper(LessonMapper.class);
       
-      int lastOrderIdx = mapper.selectLastOrderIdx();
+      Integer lastOrderIdx = mapper.selectLastOrderIdx();
+      if (lastOrderIdx == null){
+        lastOrderIdx = 0;
+      }
       lesson.setOrder(lastOrderIdx + 1);
       
       mapper.insert(lesson);
