@@ -7,23 +7,31 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
@@ -36,14 +44,16 @@ import ro.btanase.chordlearning.domain.Chord;
 import ro.btanase.chordlearning.domain.ExerciseResult;
 import ro.btanase.chordlearning.domain.Lesson;
 import ro.btanase.chordlearning.domain.Score;
+import ro.btanase.mediaplayer.IMPCallback;
+import ro.btanase.mediaplayer.MediaPlayer;
 import ro.btanase.mediaplayer.SequencePlayer;
 import ro.btanase.utils.ListUtils;
+import ro.btanase.utils.ReflectionUtils;
 import ro.btanase.utils.Searchable;
 import ca.odell.glazedlists.BasicEventList;
 
 import com.google.inject.Inject;
-import javax.swing.border.EtchedBorder;
-import javax.swing.JToggleButton;
+import java.awt.Toolkit;
 
 public class LessonCPRFrame extends JDialog implements ActionListener {
   private JTextField tfLessonName;
@@ -68,12 +78,14 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   private boolean exerciseFailed = false;
   private ScoreDao m_scores;
 
+  private final Color BK_COLOR = new Color(33, 98, 120);
+
   @Inject
   private SequencePlayer sequencePlayer;
-  
+
   @Inject
   private SettingsDao settingsDao;
-  
+
   private JScrollPane scrollPane;
   private JPanel panel_1;
   private JButton btnStop;
@@ -90,11 +102,21 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   private JToggleButton tglSlot4;
   private JToggleButton tglSlot5;
   private JPanel panel_4;
+  private JToggleButton tglClueMode;
+  private JLabel lblClueMode;
+  private Map<JComponent, Boolean> componentMap;
+  private Map<JToggleButton, Boolean> toggleButtonsSelectionStatus;
+  private List<Integer> lastSelectedSlots = new ArrayList<Integer>();
+
+  @Inject
+  protected MediaPlayer mediaPlayer;
 
   /**
    * Create the dialog.
    */
   public LessonCPRFrame(Lesson lesson) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(LessonCPRFrame.class.getResource("/res/tme_small.png")));
+    getContentPane().setBackground(BK_COLOR);
     addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(WindowEvent e) {
@@ -106,41 +128,46 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setModal(true);
     this.lesson = lesson;
-    setTitle("Chord recognition");
-    setBounds(100, 100, 774, 375);
-    getContentPane().setLayout(new MigLayout("", "[][grow][][grow]", "[][][100][118.00,grow]"));
-    
+    setTitle("Chord Progression Recognition");
+    setBounds(100, 100, 774, 413);
+    getContentPane().setLayout(new MigLayout("", "[][grow][][grow]", "[][][][100][118.00,grow]"));
+
     panel_3 = new JPanel();
-    panel_3.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Sound Sources", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+    panel_3.setForeground(new Color(255, 255, 255));
+    panel_3.setBackground(BK_COLOR);
+    panel_3.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Sound Sources",
+        TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
     getContentPane().add(panel_3, "cell 0 0,grow");
     panel_3.setLayout(new MigLayout("", "[][][][][]", "[]"));
-    
+
     tglSlot1 = new JToggleButton("Slot 1");
     panel_3.add(tglSlot1, "cell 0 0");
-    
+
     tglSlot2 = new JToggleButton("Slot 2");
     panel_3.add(tglSlot2, "cell 1 0");
-    
+
     tglSlot3 = new JToggleButton("Slot 3");
     panel_3.add(tglSlot3, "cell 2 0");
-    
+
     tglSlot4 = new JToggleButton("Slot 4");
     panel_3.add(tglSlot4, "cell 3 0");
-    
+
     tglSlot5 = new JToggleButton("Slot 5");
     panel_3.add(tglSlot5, "cell 4 0");
-    
+
     tglSlot1.addActionListener(this);
     tglSlot2.addActionListener(this);
     tglSlot3.addActionListener(this);
     tglSlot4.addActionListener(this);
     tglSlot5.addActionListener(this);
-    
+
     panel_4 = new JPanel();
+    panel_4.setBackground(BK_COLOR);
     getContentPane().add(panel_4, "cell 1 0 3 1,grow");
     panel_4.setLayout(new MigLayout("", "[][grow,fill]", "[][]"));
 
     JLabel lblLessonName = new JLabel("Lesson name:");
+    lblLessonName.setForeground(new Color(255, 255, 255));
     panel_4.add(lblLessonName, "cell 0 0");
 
     tfLessonName = new JTextField();
@@ -149,14 +176,24 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     // tfLessonName.setColumns(10);
 
     JLabel lblLessonProgress = new JLabel("Lesson Progress:");
+    lblLessonProgress.setForeground(new Color(255, 255, 255));
     panel_4.add(lblLessonProgress, "cell 0 1");
 
     tfProgress = new JTextField();
-    panel_4.add(tfProgress, "cell 1 1,growx");
+    panel_4.add(tfProgress, "flowx,cell 1 1,growx");
     tfProgress.setText("1/5");
     tfProgress.setEditable(false);
 
+    tglClueMode = new JToggleButton("Clue Mode");
+    tglClueMode.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        disableAllControls(tglClueMode.isSelected());
+      }
+    });
+    panel_4.add(tglClueMode, "cell 1 1");
+
     panel_1 = new JPanel();
+    panel_1.setBackground(BK_COLOR);
     getContentPane().add(panel_1, "cell 0 1 4 1,grow");
     panel_1.setLayout(new MigLayout("", "[58px,grow][grow]", "[26px]"));
 
@@ -180,30 +217,41 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
       }
     });
 
+    lblClueMode = new JLabel("You are now in \"Clue\" Mode. Press each chord name to listen to it!");
+    lblClueMode.setFont(new Font("Tahoma", Font.PLAIN, 16));
+    lblClueMode.setForeground(new Color(255, 131, 0));
+    getContentPane().add(lblClueMode, "cell 0 2 4 1,alignx center");
+
     scrollPane_1 = new JScrollPane();
-    getContentPane().add(scrollPane_1, "cell 0 2 4 1,grow");
+    getContentPane().add(scrollPane_1, "cell 0 3 4 1,grow");
 
     panel_2 = new JPanel();
+    panel_2.setBackground(BK_COLOR);
     scrollPane_1.setViewportView(panel_2);
     scrollPane_1.setBorder(BorderFactory.createEmptyBorder());
-    panel_2.setBorder(new TitledBorder(null, "Your answer:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Your answer:",
+        TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
     panel_2.setLayout(new MigLayout("", "[grow]", "[55,center]"));
 
     jpanelResult = new JPanel();
+    jpanelResult.setBackground(BK_COLOR);
     panel_2.add(jpanelResult, "cell 0 0,alignx center,aligny center");
     jpanelResult.setLayout(new MigLayout("inset 0, gap 20px", "[][]", "[][center]"));
 
     scrollPane = new JScrollPane();
     // scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
     scrollPane.setBorder(BorderFactory.createEmptyBorder());
-    getContentPane().add(scrollPane, "cell 0 3 4 1,grow");
+    getContentPane().add(scrollPane, "cell 0 4 4 1,grow");
 
     JPanel panel = new JPanel();
+    panel.setBackground(BK_COLOR);
     scrollPane.setViewportView(panel);
-    panel.setBorder(new TitledBorder(null, "Choose Answer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Choose Answer",
+        TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
     panel.setLayout(new MigLayout("", "[][grow][]", "[grow][25px:25px:25px]"));
 
     jpanelAnswerContainer = new JPanel();
+    jpanelAnswerContainer.setBackground(BK_COLOR);
     panel.add(jpanelAnswerContainer, "cell 1 0 2 1,alignx center,aligny center");
     jpanelAnswerContainer.setLayout(new MigLayout("wrap 8", "[]", "[]"));
 
@@ -224,7 +272,21 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
     dispatcher = new MyDispatcher();
     manager.addKeyEventDispatcher(dispatcher);
+
+    // save component list
+    lblClueMode.setVisible(false);
+    componentMap = new HashMap<JComponent, Boolean>();
+    componentMap.put(btnNextExercise, btnNextExercise.isEnabled());
+    componentMap.put(btnPlay, btnPlay.isEnabled());
+    componentMap.put(btnStop, btnStop.isEnabled());
     
+    toggleButtonsSelectionStatus = new HashMap<JToggleButton, Boolean>();
+    toggleButtonsSelectionStatus.put(tglSlot1, tglSlot1.isSelected());
+    toggleButtonsSelectionStatus.put(tglSlot2, tglSlot2.isSelected());
+    toggleButtonsSelectionStatus.put(tglSlot3, tglSlot3.isSelected());
+    toggleButtonsSelectionStatus.put(tglSlot4, tglSlot4.isSelected());
+    toggleButtonsSelectionStatus.put(tglSlot5, tglSlot5.isSelected());
+
   }
 
   private void onBtnStopActionPerformed() {
@@ -241,8 +303,13 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   }
 
   private void onBtnPlayActionPerformed() {
-    if (getSelectedSlots().isEmpty()){
+    if (getSelectedSlots().isEmpty()) {
       return;
+    }
+
+    if (!getSelectedSlots().equals(lastSelectedSlots)){
+      refreshPlayList();
+      lastSelectedSlots = getSelectedSlots();
     }
     
     if (sequencePlayer.getPlayList() != playList) {
@@ -270,34 +337,34 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   }
 
   private void refreshPlayList() {
-    
-    if (getSelectedSlots().isEmpty()){
+
+    if (getSelectedSlots().isEmpty()) {
       return;
     }
-    
+
     playList = new ArrayList<String>();
 
     List<Integer> selectedSlots = getSelectedSlots();
-    
+
     for (Chord chord : chordSequence) {
       Collections.shuffle(selectedSlots);
       int slotToPlay = selectedSlots.get(0);
-      
+
       String methodName = "";
       String fileName = "";
-      if (slotToPlay == 0){
+      if (slotToPlay == 0) {
         methodName = "getFileName";
       } else {
         methodName = "getFileName" + (slotToPlay + 1);
       }
-      try{
+      try {
         Method method = chord.getClass().getMethod(methodName, null);
         fileName = (String) method.invoke(chord, null);
-      }catch (Exception e){
+      } catch (Exception e) {
         log.error("Reflection failure", e);
         throw new RuntimeException(e);
       }
-      
+
       playList.add(fileName);
     }
   }
@@ -340,7 +407,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
 
     answerButtonList.clear();
 
-    for (Chord chord : randomAnswers) {
+    for (final Chord chord : randomAnswers) {
       JButton answerButton = new JButton(chord.getChordName());
       answerButton.setActionCommand(chord.getChordName());
       answerButton.addActionListener(new ActionListener() {
@@ -348,7 +415,30 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
           String chordName = e.getActionCommand();
-
+          if (tglClueMode.isSelected()){
+            List<Integer> slotList = getSelectedSlots();
+            Collections.shuffle(slotList);
+            
+            mediaPlayer.stopPlayback();
+            mediaPlayer.playImaFile(ReflectionUtils.invokeChordGetFileName(chord, slotList.get(0)), new IMPCallback() {
+              
+              @Override
+              public void onStop() {
+                // TODO Auto-generated method stub
+                
+              }
+              
+              @Override
+              public void onPlay() {
+                // TODO Auto-generated method stub
+                
+              }
+            });
+            
+            // exit method when done
+            return;
+          }  
+          
           Chord pressedChord = ListUtils.findInList(chordSequence, chordName, new Searchable<Chord, String>() {
 
             @Override
@@ -360,9 +450,38 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
           answeredChordSequence.add(pressedChord);
 
           lblChord = new JLabel(chordName);
+          lblChord.setForeground(Color.WHITE);
           jpanelResult.add(lblChord, "cell " + (answeredChordSequence.size() - 1) + " 0,aligny center");
           lblChord.setHorizontalAlignment(SwingConstants.CENTER);
           lblChord.setFont(new Font("Tahoma", Font.PLAIN, 33));
+          lblChord.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              JLabel currentChordLable = (JLabel) e.getComponent();
+              log.debug("clicked: " + currentChordLable.getText());
+              String chordName = currentChordLable.getText();
+              Chord selectedChord = ListUtils.findInList(answeredChordSequence, chordName,
+                  new Searchable<Chord, String>() {
+
+                    @Override
+                    public boolean match(Chord e, String t) {
+                      if (e == null) {
+                        return false;
+                      } else {
+                        return e.getChordName().equals(t);
+                      }
+                    }
+                  });
+
+              answeredChordSequence.remove(selectedChord);
+              jpanelResult.remove(currentChordLable);
+              jpanelResult.repaint();
+              jpanelResult.revalidate();
+
+            }
+
+          });
 
           // if the user pressed the last chord in sequence
           if (answeredChordSequence.size() == lesson.getNoChordsInSequence()) {
@@ -450,7 +569,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     currentExercise = 0;
     initModels();
   }
-  
+
   @Inject
   public void setM_scores(ScoreDao m_scores) {
     this.m_scores = m_scores;
@@ -538,8 +657,9 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     }
 
   }
+
   @Inject
-  private void postConstruct(){
+  private void postConstruct() {
     setToggleButtonsNames();
     checkSamplesAvailability();
     initModels();
@@ -547,84 +667,115 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
 
   private void setToggleButtonsNames() {
     String[] slots = settingsDao.getSlots();
-    
+
     tglSlot1.setText(slots[0]);
     tglSlot2.setText(slots[1]);
     tglSlot3.setText(slots[2]);
     tglSlot4.setText(slots[3]);
     tglSlot5.setText(slots[4]);
   }
-  
-  private void checkSamplesAvailability(){
+
+  private void checkSamplesAvailability() {
     List<Chord> chordList = lesson.getChordSequence();
-    
+
     for (Chord chord : chordList) {
-      if (chord.getFileName() == null){
+      if (chord.getFileName() == null) {
         tglSlot1.setEnabled(false);
       }
-      
-      if (chord.getFileName2() == null){
+
+      if (chord.getFileName2() == null) {
         tglSlot2.setEnabled(false);
       }
-      if (chord.getFileName3() == null){
+      if (chord.getFileName3() == null) {
         tglSlot3.setEnabled(false);
       }
-      if (chord.getFileName4() == null){
+      if (chord.getFileName4() == null) {
         tglSlot4.setEnabled(false);
       }
-      if (chord.getFileName5() == null){
+      if (chord.getFileName5() == null) {
         tglSlot5.setEnabled(false);
       }
     }
-    
-    if (tglSlot1.isEnabled()){
+
+    if (tglSlot1.isEnabled()) {
       tglSlot1.setSelected(true);
-    }else if (tglSlot2.isEnabled()){
+    } else if (tglSlot2.isEnabled()) {
       tglSlot2.setSelected(true);
-    }else if (tglSlot3.isEnabled()){
+    } else if (tglSlot3.isEnabled()) {
       tglSlot3.setSelected(true);
-    }else if (tglSlot4.isEnabled()){
+    } else if (tglSlot4.isEnabled()) {
       tglSlot4.setSelected(true);
-    }else if (tglSlot5.isEnabled()){
+    } else if (tglSlot5.isEnabled()) {
       tglSlot5.setSelected(true);
     }
   }
-  
-  private List<Integer> getSelectedSlots(){
+
+  private List<Integer> getSelectedSlots() {
     List<Integer> selectedSlots = new ArrayList<Integer>();
-    
-    if (tglSlot1.isSelected()){
+
+    if (tglSlot1.isSelected()) {
       selectedSlots.add(0);
     }
-    if (tglSlot2.isSelected()){
+    if (tglSlot2.isSelected()) {
       selectedSlots.add(1);
     }
-    if (tglSlot3.isSelected()){
+    if (tglSlot3.isSelected()) {
       selectedSlots.add(2);
     }
-    if (tglSlot4.isSelected()){
+    if (tglSlot4.isSelected()) {
       selectedSlots.add(3);
     }
-    if (tglSlot5.isSelected()){
+    if (tglSlot5.isSelected()) {
       selectedSlots.add(4);
     }
-    
+
     return selectedSlots;
-    
+
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    Object source = evt.getSource();
-    
-    // If any button is pressed select a different slot to play
-    if (source == tglSlot1 || source == tglSlot2 || source == tglSlot3 ||
-        source == tglSlot4 || source == tglSlot5){
-      refreshPlayList();
-    }
-    
+//    Object source = evt.getSource();
+//
+//    // If any button is pressed select a different slot to play
+//    if (source == tglSlot1 || source == tglSlot2 || source == tglSlot3 || source == tglSlot4 || source == tglSlot5) {
+//      refreshPlayList();
+//    }
+
   }
-  
-  
-  
+
+  protected void disableAllControls(boolean selected) {
+    Set<JComponent> keys = componentMap.keySet();
+    Set<JToggleButton> toggleKeys = toggleButtonsSelectionStatus.keySet();
+
+    if (selected == true) {
+      // tglClueMode.setBackground(Color.RED);
+      // save existing state
+      for (JComponent jComponent : keys) {
+        componentMap.put(jComponent, jComponent.isEnabled());
+      }
+      
+      for (JToggleButton jToggleButton : toggleKeys) {
+        toggleButtonsSelectionStatus.put(jToggleButton, jToggleButton.isSelected());
+      }
+      
+      // disable all controls
+      for (JComponent jComponent : keys) {
+        jComponent.setEnabled(false);
+      }
+      lblClueMode.setVisible(true);
+    } else {
+      for (JComponent jComponent : keys) {
+        jComponent.setEnabled(componentMap.get(jComponent));
+      }
+      lblClueMode.setVisible(false);
+
+      for (JToggleButton jToggleButton : toggleKeys) {
+        jToggleButton.setSelected(toggleButtonsSelectionStatus.get(jToggleButton));
+      }
+      
+    }
+
+  }
+
 }

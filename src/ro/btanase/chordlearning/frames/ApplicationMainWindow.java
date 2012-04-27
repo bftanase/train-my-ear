@@ -42,6 +42,16 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.JTextField;
+import java.awt.Font;
+import java.awt.Toolkit;
+import javax.swing.SwingConstants;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ApplicationMainWindow extends JFrame {
 
@@ -62,6 +72,8 @@ public class ApplicationMainWindow extends JFrame {
   private JTextPane txtpnToStartTraining;
   private static Logger log = Logger.getLogger(ApplicationMainWindow.class);
   private JMenuItem menuItemScoreReset;
+  private JPanel panel;
+  private JLabel lblNewLabel;
 
 
   /**
@@ -69,6 +81,7 @@ public class ApplicationMainWindow extends JFrame {
    */
   @Inject
   public ApplicationMainWindow(LessonDao m_lessons) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(ApplicationMainWindow.class.getResource("/res/tme_small.png")));
     addWindowListener(new WindowAdapter() {
       @Override
       public void windowOpened(WindowEvent e) {
@@ -76,7 +89,7 @@ public class ApplicationMainWindow extends JFrame {
       }
     });
     this.m_lessons = m_lessons;
-    setTitle("Guitar Chord Ear Training " + "version: " + ChordLearningApp.VERSION);
+    setTitle("Train My Ear " + "version: " + ChordLearningApp.VERSION);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setBounds(100, 100, 501, 480);
     
@@ -168,30 +181,54 @@ public class ApplicationMainWindow extends JFrame {
     });
     mnHelp.add(menuItemAbout);
     contentPane = new JPanel();
+    contentPane.setBackground(new Color(33, 98, 120));
     contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
     setContentPane(contentPane);
-    contentPane.setLayout(new MigLayout("", "[280:355.00][grow,left]", "[][][23.00,grow]"));
+    contentPane.setLayout(new MigLayout("inset 0", "[][280:355.00,grow][left]", "[48.00][][23.00,grow]"));
     
     txtpnToStartTraining = new JTextPane();
     txtpnToStartTraining.setEditable(false);
     txtpnToStartTraining.setText("To start training select a lesson below and click Go\r\nDon't forget that you can (and I highly recommend to) create your own lessons!\r\nJust go to the menu above: Configuration -> Manage Lessons");
     Border border = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+    
+    panel = new JPanel();
+    panel.setBackground(new Color(33, 98, 120));
+    panel.setBorder(null);
+    contentPane.add(panel, "cell 0 0,grow");
+    panel.setLayout(new MigLayout("inset 0", "[56px]", "[80px][]"));
+    
+    lblNewLabel = new JLabel("");
+    lblNewLabel.setBackground(new Color(33, 98, 120));
+    lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    lblNewLabel.setIcon(new ImageIcon(ApplicationMainWindow.class.getResource("/res/tme_small.png")));
+    panel.add(lblNewLabel, "cell 0 0,alignx center,aligny center");
 
     txtpnToStartTraining.setBorder(UIManager.getBorder("Button.border"));
-    contentPane.add(txtpnToStartTraining, "cell 0 0,grow");
+    contentPane.add(txtpnToStartTraining, "cell 1 0,grow");
     
     btnStartTest = new JButton("Go!");
+    btnStartTest.setFont(new Font("Tahoma", Font.BOLD, 16));
     btnStartTest.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         onBtnStartTestActionPerformed();
       }
     });
-    contentPane.add(btnStartTest, "cell 1 0,alignx left,aligny bottom");
+    contentPane.add(btnStartTest, "cell 2 0,alignx left,growy");
     
     JScrollPane scrollPane = new JScrollPane();
-    contentPane.add(scrollPane, "cell 0 1 2 2,grow");
+    contentPane.add(scrollPane, "cell 0 1 3 2,grow");
     
     jlistLessons = new JList();
+    jlistLessons.addMouseListener(new MouseAdapter() {
+
+      @Override
+      public void mouseClicked(MouseEvent evt) {
+        if (evt.getClickCount() == 2){
+          btnStartTest.doClick();
+        }
+      }
+      
+    });
     jlistLessons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     scrollPane.setViewportView(jlistLessons);
     

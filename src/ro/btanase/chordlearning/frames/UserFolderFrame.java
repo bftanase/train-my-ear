@@ -25,19 +25,23 @@ import ro.btanase.chordlearning.services.UserData;
 import com.google.inject.Inject;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.BevelBorder;
+import java.awt.Color;
+import java.awt.Toolkit;
 
 public class UserFolderFrame extends JDialog {
   private JTextField tfApplicationData;
   private UserData userData;
   private UserFolderFrame uff;
   private static Logger log = Logger.getLogger(UserFolderFrame.class);
-
+  private final Color BK_COLOR = new Color(33, 98, 120);
 
   /**
    * Create the dialog.
    */
   @Inject
   public UserFolderFrame(UserData userData) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(UserFolderFrame.class.getResource("/res/tme_small.png")));
+    getContentPane().setBackground(BK_COLOR);
     this.userData = userData;
     setModal(true);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -54,6 +58,7 @@ public class UserFolderFrame extends JDialog {
     getContentPane().add(textPane, "cell 0 0 4 1,growx");
     
     JLabel lblSelectedFolder = new JLabel("Selected folder:");
+    lblSelectedFolder.setForeground(new Color(255, 255, 255));
     getContentPane().add(lblSelectedFolder, "cell 1 2,alignx trailing");
     
     tfApplicationData = new JTextField();

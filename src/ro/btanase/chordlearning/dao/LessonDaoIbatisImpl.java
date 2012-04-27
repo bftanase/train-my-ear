@@ -237,6 +237,10 @@ public class LessonDaoIbatisImpl implements LessonDao {
     }    
   }
 
-  
+  @Override
+  public void copyLesson(Lesson oldLesson, String newLessonName) {
+    oldLesson.setLessonName(newLessonName);
+    this.addLesson(oldLesson);
+  }
   
 }

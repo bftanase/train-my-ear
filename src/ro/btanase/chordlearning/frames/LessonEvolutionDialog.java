@@ -1,6 +1,7 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -30,10 +31,12 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventComboBoxModel;
 
 import com.google.inject.Inject;
+import java.awt.Toolkit;
 
 public class LessonEvolutionDialog extends JDialog {
 
   private final JPanel contentPanel = new JPanel();
+  
   private JComboBox cbLesson;
   
   private LessonDao m_lessons;
@@ -42,12 +45,15 @@ public class LessonEvolutionDialog extends JDialog {
   
   private static Logger log = Logger.getLogger(LessonEvolutionDialog.class);
 
-  
+  private final Color BK_COLOR = new Color(33, 98, 120);
   /**
    * Create the dialog.
    */
   @Inject
   public LessonEvolutionDialog(LessonDao m_lessons, ScoreDao m_scores) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(LessonEvolutionDialog.class.getResource("/res/tme_small.png")));
+    getContentPane().setBackground(BK_COLOR);
+    contentPanel.setBackground(BK_COLOR);
     setTitle("Lesson Evolution Statistics");
     this.m_scores = m_scores;
     this.m_lessons = m_lessons;
@@ -59,6 +65,7 @@ public class LessonEvolutionDialog extends JDialog {
     contentPanel.setLayout(new MigLayout("", "[][145.00][grow]", "[][][grow]"));
     {
       JLabel lblDisplayStatsFor = new JLabel("Display stats for lesson: ");
+      lblDisplayStatsFor.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblDisplayStatsFor, "cell 0 1");
     }
     {

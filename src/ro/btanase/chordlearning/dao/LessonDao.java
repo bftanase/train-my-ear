@@ -23,4 +23,6 @@ public interface LessonDao {
   public void moveDown(Lesson lesson);
   
   public EventList<Chord> getChordsFromLesson(int lessonId);
+  
+  public void copyLesson(Lesson oldLesson, String newLessonName);
 }

@@ -1,6 +1,7 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,10 +15,12 @@ import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 import ro.btanase.chordlearning.ChordLearningApp;
+import java.awt.Toolkit;
 
 public class AboutDialog extends JDialog {
 
   private final JPanel contentPanel = new JPanel();
+  private final Color BK_COLOR = new Color(33, 98, 120);
 
   /**
    * Launch the application.
@@ -36,11 +39,14 @@ public class AboutDialog extends JDialog {
    * Create the dialog.
    */
   public AboutDialog() {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(AboutDialog.class.getResource("/res/tme_small.png")));
     setModal(true);
-    setTitle("About GCET");
+    setTitle("About Train My Ear");
     setBounds(100, 100, 460, 319);
     getContentPane().setLayout(new BorderLayout());
+    getContentPane().setBackground(BK_COLOR);
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+    contentPanel.setBackground(BK_COLOR);
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     contentPanel.setLayout(new MigLayout("", "[grow]", "[grow]"));
     {
@@ -51,16 +57,12 @@ public class AboutDialog extends JDialog {
         scrollPane.setViewportView(txtpnguitarChordEar);
         txtpnguitarChordEar.setContentType("text/html");
         txtpnguitarChordEar.setEditable(false);
-        txtpnguitarChordEar.setText("<h3>Guitar Chord Ear Training</h3>\r\n\r\nCopyright: Bogdan Tanase 2011 \r\n <br> " +
-              "Contact: bftanase@gmail.com <br/>" +
-              "Version: " + ChordLearningApp.VERSION + " freeware \r\n <br/>" + 
-              "<p> </p> Thanks to: <br/>" +
-              "LBro - for providing the chord samples and valuable feedback <br/>" +
-              "and to all the wonderful people from the Java open source community!");
+        txtpnguitarChordEar.setText("<h3>Train My Ear</h3>\r\n\r\nCopyright: Bogdan Tanase 2011 \r\n <br> Contact: bftanase@gmail.com <br/>Version: 1.0.0 freeware \r\n <br/><p> </p> Thanks to: <br/>LBro - for providing the chord samples and valuable feedback <br/>and to all the wonderful people from the Java open source community!");
       }
     }
     {
       JPanel buttonPane = new JPanel();
+      buttonPane.setBackground(BK_COLOR);
       buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
       getContentPane().add(buttonPane, BorderLayout.SOUTH);
       {

@@ -1,6 +1,7 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,8 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventListModel;
 
 import com.google.inject.Inject;
+import java.awt.Toolkit;
+import javax.swing.border.EtchedBorder;
 
 public class AddLessonFrame extends JDialog {
 
@@ -59,12 +62,16 @@ public class AddLessonFrame extends JDialog {
   private JTextField tfChordDelay;
   private JLabel lblChordDelay;
   private JLabel lblNoChordsInProgression;
+  
+  private Color BK_COLOR = new Color(33, 98, 120); 
 
   /**
    * Create the dialog.
    */
   @Inject
   public AddLessonFrame(ChordDao m_chords) {
+    getContentPane().setBackground(BK_COLOR);
+    setIconImage(Toolkit.getDefaultToolkit().getImage(AddLessonFrame.class.getResource("/res/tme_small.png")));
     setModal(true);
     this.m_chords = m_chords;
     // this.m_lessons = m_lessons;
@@ -72,11 +79,13 @@ public class AddLessonFrame extends JDialog {
     setTitle("Add/Edit Lesson");
     setBounds(100, 100, 775, 500);
     getContentPane().setLayout(new BorderLayout());
+    contentPanel.setBackground(BK_COLOR);
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     contentPanel.setLayout(new MigLayout("", "[][100px:n,grow][][100px:n,grow]", "[][][grow][][grow]"));
     {
       JLabel lblLessonName = new JLabel("Lesson Name:");
+      lblLessonName.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblLessonName, "cell 0 0,alignx left");
     }
     {
@@ -86,10 +95,12 @@ public class AddLessonFrame extends JDialog {
     }
     {
       JLabel lblChordPool = new JLabel("Chord Pool");
+      lblChordPool.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblChordPool, "cell 0 1");
     }
     {
       JLabel lblSelectedChords = new JLabel("Selected Chords");
+      lblSelectedChords.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblSelectedChords, "cell 3 1");
     }
     {
@@ -129,11 +140,14 @@ public class AddLessonFrame extends JDialog {
     }
     {
       JPanel panel = new JPanel();
-      panel.setBorder(new TitledBorder(null, "Lesson Options", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+      panel.setForeground(new Color(255, 255, 255));
+      panel.setBackground(BK_COLOR);
+      panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Lesson Options", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
       contentPanel.add(panel, "cell 0 4 2 1,grow");
       panel.setLayout(new MigLayout("", "[][][grow]", "[][]"));
       {
         JLabel lblNumberOfQuestions = new JLabel("Number of questions in the lesson: ");
+        lblNumberOfQuestions.setForeground(new Color(255, 255, 255));
         panel.add(lblNumberOfQuestions, "cell 1 1,alignx trailing");
       }
       {
@@ -144,15 +158,20 @@ public class AddLessonFrame extends JDialog {
     }
     {
       JPanel panel = new JPanel();
-      panel.setBorder(new TitledBorder(null, "Lesson type", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+      panel.setBackground(BK_COLOR);
+      panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Lesson type", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
       contentPanel.add(panel, "cell 2 4 2 1,grow");
       panel.setLayout(new MigLayout("", "[grow]", "[][][grow]"));
       {
         rbSSR = new JRadioButton("Single Sound Recognition");
+        rbSSR.setForeground(new Color(255, 255, 255));
+        rbSSR.setBackground(BK_COLOR);
         panel.add(rbSSR, "cell 0 0");
       }
       {
         rbCPR = new JRadioButton("Chord Progression Recognition");
+        rbCPR.setForeground(new Color(255, 255, 255));
+        rbCPR.setBackground(BK_COLOR);
         rbCPR.addChangeListener(new ChangeListener() {
           
           @Override
@@ -165,10 +184,12 @@ public class AddLessonFrame extends JDialog {
       }
       {
         JPanel panel_1 = new JPanel();
+        panel_1.setBackground(BK_COLOR);
         panel.add(panel_1, "cell 0 2,grow");
         panel_1.setLayout(new MigLayout("", "[][grow]", "[][]"));
         {
           lblNoChordsInProgression = new JLabel("No of chords in progression:");
+          lblNoChordsInProgression.setForeground(new Color(255, 255, 255));
           panel_1.add(lblNoChordsInProgression, "cell 0 0,alignx trailing");
         }
         {
@@ -178,6 +199,7 @@ public class AddLessonFrame extends JDialog {
         }
         {
           lblChordDelay = new JLabel("Delay between chords:");
+          lblChordDelay.setForeground(new Color(255, 255, 255));
           panel_1.add(lblChordDelay, "cell 0 1,alignx trailing");
         }
         {
@@ -187,12 +209,14 @@ public class AddLessonFrame extends JDialog {
         }
         {
           JLabel lblMiliseconds = new JLabel("miliseconds");
+          lblMiliseconds.setForeground(new Color(255, 255, 255));
           panel_1.add(lblMiliseconds, "cell 1 1");
         }
       }
     }
     {
       JPanel buttonPane = new JPanel();
+      buttonPane.setBackground(BK_COLOR);
       buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
       getContentPane().add(buttonPane, BorderLayout.SOUTH);
       {

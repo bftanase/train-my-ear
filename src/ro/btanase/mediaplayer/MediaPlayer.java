@@ -96,6 +96,7 @@ public class MediaPlayer {
   public void stopPlayback() {
     if (sourceLine != null){
       sourceLine.stop();
+      sourceLine.drain();
       sourceLine.close();
     }
 

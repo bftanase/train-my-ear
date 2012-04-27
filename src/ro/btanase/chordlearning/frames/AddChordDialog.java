@@ -1,6 +1,7 @@
 package ro.btanase.chordlearning.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ import ro.btanase.utils.ReflectionUtils;
 
 import com.google.inject.Inject;
 import javax.swing.JToggleButton;
+import java.awt.Toolkit;
 
 public class AddChordDialog extends JDialog implements ActionListener{
 
@@ -68,6 +70,8 @@ public class AddChordDialog extends JDialog implements ActionListener{
   
   private ButtonGroup buttonGroupToggle;
   
+  private final Color BK_COLOR = new Color(33, 98, 120);
+  
   /**
    * This constructor should be used when editing chords
    * 
@@ -87,16 +91,23 @@ public class AddChordDialog extends JDialog implements ActionListener{
    * @wbp.parser.constructor
    */
   public AddChordDialog(IDialog<Chord> dialogCallback) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(AddChordDialog.class.getResource("/res/tme_small.png")));
     setModal(true);
     this.dialogCallback = dialogCallback;
-    setTitle("Add new chord");
+    setTitle("Add new sound sample");
     setBounds(100, 100, 611, 234);
     getContentPane().setLayout(new BorderLayout());
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     contentPanel.setLayout(new MigLayout("", "[][][grow][]", "[][][][][]"));
+
+    getContentPane().setBackground(BK_COLOR);
+    contentPanel.setBackground(BK_COLOR);
+    
     {
       panel = new JPanel();
+      
+      panel.setBackground(BK_COLOR);
       contentPanel.add(panel, "cell 0 0 4 1,grow");
       panel.setLayout(new MigLayout("", "[120][120][120][120][120]", "[46.00,fill]"));
       {
@@ -122,6 +133,7 @@ public class AddChordDialog extends JDialog implements ActionListener{
     }
     {
       lblNewLabel = new JLabel("Sample pack name:");
+      lblNewLabel.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblNewLabel, "cell 0 1");
     }
     {
@@ -130,7 +142,8 @@ public class AddChordDialog extends JDialog implements ActionListener{
       tfPackName.setColumns(10);
     }
     {
-      JLabel lblChordName = new JLabel("Chord name:");
+      JLabel lblChordName = new JLabel("Sample name:");
+      lblChordName.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblChordName, "cell 0 2 2 1,alignx left");
     }
     {
@@ -173,10 +186,14 @@ public class AddChordDialog extends JDialog implements ActionListener{
     }
     {
       chckbxDelayedRecording = new JCheckBox("Delayed Recording (5 sec)");
+      chckbxDelayedRecording.setForeground(new Color(255, 255, 255));
+      
+      chckbxDelayedRecording.setBackground(BK_COLOR);
       contentPanel.add(chckbxDelayedRecording, "cell 1 4 2 1");
     }
     {
       JPanel buttonPane = new JPanel();
+      buttonPane.setBackground(BK_COLOR);
       buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
       getContentPane().add(buttonPane, BorderLayout.SOUTH);
       {

@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 import ro.btanase.chordlearning.domain.ExerciseResult;
 import ro.btanase.chordlearning.domain.Score;
+import java.awt.Toolkit;
 
 public class TestResultFrame extends JDialog {
 
@@ -32,19 +33,20 @@ public class TestResultFrame extends JDialog {
   private Score score;
   private JPanel jpanelResultsContainer;
   private LessonSSRFrame ltf;
-
+  private final Color BK_COLOR = new Color(33, 98, 120);
 
   /**
    * Create the dialog.
    */
   public TestResultFrame(final LessonSSRFrame ltf, Score score) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(TestResultFrame.class.getResource("/res/tme_small.png")));
     addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(WindowEvent e) {
         ltf.dispose();
-
       }
     });
+    contentPanel.setBackground(BK_COLOR);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setModal(true);
     this.score = score;
@@ -57,6 +59,7 @@ public class TestResultFrame extends JDialog {
     contentPanel.setLayout(new MigLayout("", "[54.00][grow]", "[][][grow]"));
     {
       JLabel lblAccuracy = new JLabel("Accuracy:");
+      lblAccuracy.setForeground(new Color(255, 255, 255));
       contentPanel.add(lblAccuracy, "cell 0 0,alignx right");
     }
     {
@@ -68,6 +71,7 @@ public class TestResultFrame extends JDialog {
     }
     {
       JLabel lblResults = new JLabel("Results");
+      lblResults.setForeground(new Color(255, 255, 255));
       lblResults.setFont(new Font("Tahoma", Font.BOLD, 14));
       lblResults.setHorizontalAlignment(SwingConstants.CENTER);
       contentPanel.add(lblResults, "cell 0 1 2 1,growx");
@@ -77,6 +81,7 @@ public class TestResultFrame extends JDialog {
       contentPanel.add(scrollPane, "cell 0 2 2 1,grow");
       {
         jpanelResultsContainer = new JPanel();
+        jpanelResultsContainer.setBackground(BK_COLOR);
         jpanelResultsContainer.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
         scrollPane.setViewportView(jpanelResultsContainer);
         jpanelResultsContainer.setLayout(new MigLayout("insets 10 0 10 10", "[54][46px,grow]", "[14px][]"));
@@ -110,6 +115,7 @@ public class TestResultFrame extends JDialog {
     }
     {
       JPanel buttonPane = new JPanel();
+      buttonPane.setBackground(BK_COLOR);
       getContentPane().add(buttonPane, BorderLayout.SOUTH);
       buttonPane.setLayout(new MigLayout("", "[][65px,grow]", "[23px]"));
       {
@@ -160,9 +166,10 @@ public class TestResultFrame extends JDialog {
     int i = 0;
     for(ExerciseResult er : exerciseResults){
       JLabel chordNameLabel = new JLabel(er.getChord().getChordName());
+      chordNameLabel.setForeground(Color.WHITE);
       JTextField resultTextField = new JTextField();
       if (er.isCorrect()){
-        resultTextField.setForeground(Color.GREEN);
+        resultTextField.setForeground(new Color(60, 179, 113));
         resultTextField.setText("correct");
         resultTextField.setEditable(false);
       }else{

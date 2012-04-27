@@ -1,5 +1,6 @@
 package ro.btanase.chordlearning.frames;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.util.Comparator;
 
@@ -26,27 +27,31 @@ import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.swing.EventTableModel;
 
 import com.google.inject.Inject;
+import java.awt.Toolkit;
 
 public class ChordAccuracyFrame extends JDialog {
   private JTable jtableScore;
   private ScoreDao m_scores;
   private SortedList<ChordAccuracyWrapper> chordAccuracyList;
   private ChartPanel chartPanel;
-  
+  private final Color BK_COLOR = new Color(33, 98, 120);  
 
   /**
    * Create the frame.
    */
   @Inject
   public ChordAccuracyFrame(ScoreDao m_scores) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(ChordAccuracyFrame.class.getResource("/res/tme_small.png")));
     setTitle("Chord Identification Score");
     setModal(true);
     this.m_scores = m_scores;
     setBounds(100, 100, 755, 420);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    getContentPane().setBackground(BK_COLOR);
     getContentPane().setLayout(new MigLayout("", "[grow]", "[][grow]"));
     
     JLabel lblChordIdentificationScore = new JLabel("Chord Identification Score");
+    lblChordIdentificationScore.setForeground(new Color(255, 255, 255));
     lblChordIdentificationScore.setFont(new Font("Tahoma", Font.BOLD, 16));
     getContentPane().add(lblChordIdentificationScore, "cell 0 0,alignx center");
     
@@ -54,6 +59,7 @@ public class ChordAccuracyFrame extends JDialog {
     getContentPane().add(splitPane, "cell 0 1,grow");
     
     JPanel panel = new JPanel();
+    panel.setBackground(BK_COLOR);
     splitPane.setLeftComponent(panel);
     panel.setLayout(new MigLayout("", "[-82.00][100px:300px,grow]", "[][grow]"));
     
@@ -64,6 +70,7 @@ public class ChordAccuracyFrame extends JDialog {
     scrollPane.setViewportView(jtableScore);
     
     JPanel panel_1 = new JPanel();
+    panel_1.setBackground(BK_COLOR);
     splitPane.setRightComponent(panel_1);
     panel_1.setLayout(new MigLayout("", "[300px,grow]", "[420px,grow]"));
     

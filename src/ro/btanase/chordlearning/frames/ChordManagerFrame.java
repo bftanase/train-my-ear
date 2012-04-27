@@ -1,5 +1,6 @@
 package ro.btanase.chordlearning.frames;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.JRadioButton;
 import javax.swing.JComboBox;
 import javax.swing.ButtonGroup;
+import javax.swing.border.EtchedBorder;
+import java.awt.Toolkit;
 
 public class ChordManagerFrame extends JDialog {
 
@@ -61,23 +64,28 @@ public class ChordManagerFrame extends JDialog {
   private JRadioButton rbSlot3;
   private JRadioButton rbSlot4;
   private JRadioButton rbSlot5;
+  
+  private final Color BK_COLOR = new Color(33, 98, 120);  
 
   /**
    * Create the frame.
    */
   @Inject
   public ChordManagerFrame(ChordDao m_chords) {
+    setIconImage(Toolkit.getDefaultToolkit().getImage(ChordManagerFrame.class.getResource("/res/tme_small.png")));
     setModal(true);
     this.m_chords = m_chords;
     setTitle("Chord Definition");
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     setBounds(100, 100, 459, 434);
     contentPane = new JPanel();
+    contentPane.setBackground(BK_COLOR);
     contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
     setContentPane(contentPane);
     contentPane.setLayout(new MigLayout("", "[200.00,grow][120px:120px:180px,grow,fill]", "[][][][][][grow]"));
 
     JLabel lblExistingChords = new JLabel("Existing Chords:");
+    lblExistingChords.setForeground(new Color(255, 255, 255));
     contentPane.add(lblExistingChords, "cell 0 0");
 
     JScrollPane scrollPane = new JScrollPane();
@@ -115,28 +123,40 @@ public class ChordManagerFrame extends JDialog {
     contentPane.add(btnDeleteChord, "cell 1 3,growx");
 
     JPanel panel = new JPanel();
-    panel.setBorder(new TitledBorder(null, "Test Samples", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    panel.setForeground(new Color(255, 255, 255));
+    panel.setBackground(BK_COLOR);
+    panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Test Samples", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
     contentPane.add(panel, "cell 1 4,grow");
     panel.setLayout(new MigLayout("", "[grow,fill]", "[][][][][][]"));
 
     rbSlot1 = new JRadioButton("Slot 1");
+    rbSlot1.setForeground(new Color(255, 255, 255));
+    rbSlot1.setBackground(BK_COLOR);
     rbSlot1.setSelected(true);
     buttonGroup.add(rbSlot1);
     panel.add(rbSlot1, "cell 0 0,growx");
 
     rbSlot2 = new JRadioButton("Slot 2");
+    rbSlot2.setForeground(new Color(255, 255, 255));
+    rbSlot2.setBackground(BK_COLOR);
     buttonGroup.add(rbSlot2);
     panel.add(rbSlot2, "cell 0 1");
 
     rbSlot3 = new JRadioButton("Slot 3");
+    rbSlot3.setForeground(new Color(255, 255, 255));
+    rbSlot3.setBackground(BK_COLOR);
     buttonGroup.add(rbSlot3);
     panel.add(rbSlot3, "cell 0 2");
 
     rbSlot4 = new JRadioButton("Slot 4");
+    rbSlot4.setForeground(new Color(255, 255, 255));
+    rbSlot4.setBackground(BK_COLOR);
     buttonGroup.add(rbSlot4);
     panel.add(rbSlot4, "cell 0 3");
 
     rbSlot5 = new JRadioButton("Slot 5");
+    rbSlot5.setForeground(new Color(255, 255, 255));
+    rbSlot5.setBackground(BK_COLOR);
     buttonGroup.add(rbSlot5);
     panel.add(rbSlot5, "cell 0 4");
 
