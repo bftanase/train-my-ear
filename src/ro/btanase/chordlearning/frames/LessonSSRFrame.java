@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import ro.btanase.chordlearning.ChordLearningApp;
 import ro.btanase.chordlearning.dao.ScoreDao;
 import ro.btanase.chordlearning.dao.SettingsDao;
 import ro.btanase.chordlearning.domain.Chord;
@@ -52,7 +53,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.SwingConstants;
 import java.awt.Toolkit;
 
-public class LessonSSRFrame extends JDialog implements ActionListener {
+public class LessonSSRFrame extends JDialog implements ActionListener, IClue {
   private JTextField tfLessonName;
   private JTextField tfProgress;
   private Lesson lesson;
@@ -65,7 +66,7 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
   private JLabel lblAnswerResult;
   private JButton btnNextExercise;
   private List<JButton> answerButtonList = new ArrayList<JButton>();
-  
+
   private final Color BK_COLOR = new Color(33, 98, 120);
 
   private Score score;
@@ -79,11 +80,11 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
   @Inject
   private MediaPlayer mediaPlayer;
   /**
-   * this is set randomly from selected slots; it should
-     be reset on exercise start and if a slot button is changed
+   * this is set randomly from selected slots; it should be reset on exercise
+   * start and if a slot button is changed
    */
-  private int slotToPlay; 
-  
+  private int slotToPlay;
+
   private JScrollPane scrollPane;
   private JPanel panel_1;
   private JButton btnStop;
@@ -99,17 +100,18 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
   private JToggleButton tglClueMode;
 
   private Map<JComponent, Boolean> componentMap;
-  private JLabel lblClueMode;
-  
+
   private Map<JToggleButton, Boolean> toggleButtonsSelectionStatus;
   private List<Integer> lastSelectedSlots = new ArrayList<Integer>();
-  
-  
+
+  private ClueDialog clueDialog;
+
   /**
    * Create the dialog.
    */
   public LessonSSRFrame(Lesson lesson) {
-    setIconImage(Toolkit.getDefaultToolkit().getImage(LessonSSRFrame.class.getResource("/res/tme_small.png")));
+    setIconImage(Toolkit.getDefaultToolkit().getImage(
+        LessonSSRFrame.class.getResource("/res/tme_small.png")));
     getContentPane().setBackground(new Color(33, 98, 120));
     addWindowListener(new WindowAdapter() {
       @Override
@@ -122,37 +124,40 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
     this.lesson = lesson;
     setTitle("Single Sound Recognition");
     setBounds(100, 100, 774, 351);
-    getContentPane().setLayout(new MigLayout("", "[][grow][grow][]", "[][][][][grow]"));
-    
+    getContentPane().setLayout(
+        new MigLayout("", "[][grow][grow][]", "[][][][grow]"));
+
     panel_2 = new JPanel();
     panel_2.setForeground(new Color(255, 255, 255));
     panel_2.setBackground(BK_COLOR);
-    panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Sound sources", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
+    panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED,
+        null, null), "Sound sources", TitledBorder.LEADING, TitledBorder.TOP,
+        null, new Color(255, 255, 255)));
     getContentPane().add(panel_2, "cell 0 0 1 2,grow");
     panel_2.setLayout(new MigLayout("", "[][][][][]", "[]"));
-    
+
     tglSlot1 = new JToggleButton("Slot 1");
-    
+
     panel_2.add(tglSlot1, "cell 0 0");
-    
+
     tglSlot2 = new JToggleButton("Slot 2");
     panel_2.add(tglSlot2, "cell 1 0");
-    
+
     tglSlot3 = new JToggleButton("Slot 3");
     panel_2.add(tglSlot3, "cell 2 0");
-    
+
     tglSlot4 = new JToggleButton("Slot 4");
     panel_2.add(tglSlot4, "cell 3 0");
-    
+
     tglSlot5 = new JToggleButton("Slot 5");
     panel_2.add(tglSlot5, "cell 4 0");
-    
+
     tglSlot1.addActionListener(this);
     tglSlot2.addActionListener(this);
     tglSlot3.addActionListener(this);
     tglSlot4.addActionListener(this);
     tglSlot5.addActionListener(this);
-    
+
     panel_3 = new JPanel();
     panel_3.setBackground(BK_COLOR);
     getContentPane().add(panel_3, "cell 1 0 3 2,grow");
@@ -175,13 +180,13 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
     panel_3.add(tfProgress, "flowx,cell 1 1,growx");
     tfProgress.setText("1/5");
     tfProgress.setEditable(false);
-    
+
     tglClueMode = new JToggleButton("Clue Mode");
+    tglClueMode.setMnemonic('c');
     tglClueMode.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         disableAllControls(tglClueMode.isSelected());
-          
-        
+
       }
     });
     panel_3.add(tglClueMode, "cell 1 1");
@@ -210,26 +215,24 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
 
       }
     });
-    
-    lblClueMode = new JLabel("You are now in \"Clue\" Mode. Press each chord name to listen to it!");
-    lblClueMode.setFont(new Font("Tahoma", Font.PLAIN, 16));
-    lblClueMode.setForeground(new Color(255, 131, 0));
-    lblClueMode.setHorizontalAlignment(SwingConstants.CENTER);
-    getContentPane().add(lblClueMode, "cell 0 3 4 1,alignx center");
 
     scrollPane = new JScrollPane();
-    getContentPane().add(scrollPane, "cell 0 4 4 1,grow");
+    getContentPane().add(scrollPane, "cell 0 3 4 1,grow");
 
     JPanel panel = new JPanel();
     panel.setBackground(BK_COLOR);
     scrollPane.setViewportView(panel);
     scrollPane.setBorder(BorderFactory.createEmptyBorder());
-    panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Choose Answer", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
-    panel.setLayout(new MigLayout("", "[][grow][]", "[][grow][25px:25px:25px]"));
+    panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED,
+        null, null), "Choose Answer", TitledBorder.LEADING, TitledBorder.TOP,
+        null, new Color(255, 255, 255)));
+    panel
+        .setLayout(new MigLayout("", "[][grow][]", "[][grow][25px:25px:25px]"));
 
     jpanelAnswerContainer = new JPanel();
     jpanelAnswerContainer.setBackground(BK_COLOR);
-    panel.add(jpanelAnswerContainer, "cell 1 1 2 1,alignx center,aligny center");
+    panel
+        .add(jpanelAnswerContainer, "cell 0 1 3 1,alignx center,aligny center");
     jpanelAnswerContainer.setLayout(new MigLayout("wrap 8", "[]", "[]"));
 
     lblAnswerResult = new JLabel("");
@@ -252,18 +255,12 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
 
     initModels();
 
-    // save to a hasmap the controls that will enable/disable when switching to "Clue Mode"
+    // save to a hasmap the controls that will enable/disable when switching to
+    // "Clue Mode"
     componentMap = new HashMap<JComponent, Boolean>();
     componentMap.put(btnNextExercise, btnNextExercise.isEnabled());
     componentMap.put(btnPlay, btnPlay.isEnabled());
     componentMap.put(btnStop, btnStop.isEnabled());
-//    componentMap.put(tglSlot1, tglSlot1.isEnabled());
-//    componentMap.put(tglSlot2, tglSlot2.isEnabled());
-//    componentMap.put(tglSlot3, tglSlot3.isEnabled());
-//    componentMap.put(tglSlot4, tglSlot4.isEnabled());
-//    componentMap.put(tglSlot5, tglSlot5.isEnabled());
-    
-    lblClueMode.setVisible(false);
 
     toggleButtonsSelectionStatus = new HashMap<JToggleButton, Boolean>();
     toggleButtonsSelectionStatus.put(tglSlot1, tglSlot1.isSelected());
@@ -271,43 +268,55 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
     toggleButtonsSelectionStatus.put(tglSlot3, tglSlot3.isSelected());
     toggleButtonsSelectionStatus.put(tglSlot4, tglSlot4.isSelected());
     toggleButtonsSelectionStatus.put(tglSlot5, tglSlot5.isSelected());
-    
+
   }
 
   protected void disableAllControls(boolean selected) {
-    Set<JComponent> keys = componentMap.keySet();
-    Set<JToggleButton> toggleKeys = toggleButtonsSelectionStatus.keySet();
-    
-    if (selected == true){
-//      tglClueMode.setBackground(Color.RED);
-      // save existing state
-      for (JComponent jComponent : keys) {
-        componentMap.put(jComponent, jComponent.isEnabled());
-      }
-      
-      for (JToggleButton jToggleButton : toggleKeys) {
-        toggleButtonsSelectionStatus.put(jToggleButton, jToggleButton.isSelected());
-      }
-      
-      
-      // disable all controls
-      for (JComponent jComponent : keys) {
-        jComponent.setEnabled(false);
-      }
-      lblClueMode.setVisible(true);
+
+    if (selected) {
+      clueDialog = new ClueDialog(this, lesson);
+      ChordLearningApp.getInjector().injectMembers(clueDialog);
+      clueDialog.setVisible(true);
     } else {
-      for (JComponent jComponent : keys) {
-        jComponent.setEnabled(componentMap.get(jComponent));
+      if (clueDialog != null) {
+        clueDialog.dispose();
       }
-      lblClueMode.setVisible(false);
-      
-      for (JToggleButton jToggleButton : toggleKeys) {
-        jToggleButton.setSelected(toggleButtonsSelectionStatus.get(jToggleButton));
-      }
-      
-      
     }
-    
+    //
+    // Set<JComponent> keys = componentMap.keySet();
+    // Set<JToggleButton> toggleKeys = toggleButtonsSelectionStatus.keySet();
+    //
+    // if (selected == true){
+    // // tglClueMode.setBackground(Color.RED);
+    // // save existing state
+    // for (JComponent jComponent : keys) {
+    // componentMap.put(jComponent, jComponent.isEnabled());
+    // }
+    //
+    // for (JToggleButton jToggleButton : toggleKeys) {
+    // toggleButtonsSelectionStatus.put(jToggleButton,
+    // jToggleButton.isSelected());
+    // }
+    //
+    //
+    // // disable all controls
+    // for (JComponent jComponent : keys) {
+    // jComponent.setEnabled(false);
+    // }
+    // lblClueMode.setVisible(true);
+    // } else {
+    // for (JComponent jComponent : keys) {
+    // jComponent.setEnabled(componentMap.get(jComponent));
+    // }
+    // lblClueMode.setVisible(false);
+    //
+    // for (JToggleButton jToggleButton : toggleKeys) {
+    // jToggleButton.setSelected(toggleButtonsSelectionStatus.get(jToggleButton));
+    // }
+    //
+    //
+    // }
+
   }
 
   private void onBtnStopActionPerformed() {
@@ -348,35 +357,35 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
 
     List<Integer> selectedSlots = getSelectedSlots();
 
-    if (!getSelectedSlots().equals(lastSelectedSlots)){
+    if (!getSelectedSlots().equals(lastSelectedSlots)) {
       randomizeSlot();
       lastSelectedSlots = getSelectedSlots();
     }
-    
-    
-    if (selectedSlots.isEmpty()){
-      JOptionPane.showMessageDialog(LessonSSRFrame.this, "You must select at least one sound source",
-            "No samples selected", JOptionPane.WARNING_MESSAGE);
+
+    if (selectedSlots.isEmpty()) {
+      JOptionPane.showMessageDialog(LessonSSRFrame.this,
+          "You must select at least one sound source", "No samples selected",
+          JOptionPane.WARNING_MESSAGE);
       return;
     }
-    
+
     mediaPlayer.stopPlayback();
 
     String methodName = "";
     String fileToPlay = "";
-    if (slotToPlay == 0){
+    if (slotToPlay == 0) {
       methodName = "getFileName";
     } else {
       methodName = "getFileName" + (slotToPlay + 1);
     }
     try {
-      Method method = activeChord.getClass().getMethod(methodName, null); 
+      Method method = activeChord.getClass().getMethod(methodName, null);
       fileToPlay = (String) method.invoke(activeChord, null);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Reflection failure", e);
       throw new RuntimeException(e);
     }
-    
+
     mediaPlayer.playImaFile(fileToPlay, new IMPCallback() {
 
       @Override
@@ -406,7 +415,8 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
     jpanelAnswerContainer.revalidate();
     activeChord = exerciseStack.pop();
 
-    tfProgress.setText((lesson.getNoQuestions() - exerciseStack.size()) + "/" + lesson.getNoQuestions());
+    tfProgress.setText((lesson.getNoQuestions() - exerciseStack.size()) + "/"
+        + lesson.getNoQuestions());
 
     generateAnswerButtons();
     lblAnswerResult.setText("");
@@ -431,6 +441,8 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
 
     Collections.sort(randomAnswers, comparator);
 
+    // since the lesson might be configured with the same chord multiple times
+    // duplicates must be removed
     randomAnswers = ListUtils.removeDuplicates(randomAnswers, comparator);
 
     answerButtonList.clear();
@@ -443,60 +455,37 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
           String chordName = e.getActionCommand();
-          
-          if (tglClueMode.isSelected()){
-            List<Integer> slotList = getSelectedSlots();
-            Collections.shuffle(slotList);
-            
-            mediaPlayer.stopPlayback();
-            mediaPlayer.playImaFile(ReflectionUtils.invokeChordGetFileName(chord, slotList.get(0)), new IMPCallback() {
-              
-              @Override
-              public void onStop() {
-                // TODO Auto-generated method stub
-                
-              }
-              
-              @Override
-              public void onPlay() {
-                // TODO Auto-generated method stub
-                
-              }
-            });
-            
-            
-            
-          }else {
-          
-            if (chordName.equals(activeChord.getChordName())) {
-              log.info("Answer correct: " + chordName);
-              lblAnswerResult.setForeground(Color.GREEN);
-              lblAnswerResult.setText("The answer is correct!");
-              btnNextExercise.setVisible(true);
-              setEnabledAllbuttons(false);
-              if (!exerciseFailed) {
-                exerciseResultList.add(new ExerciseResult(activeChord, true));
-              }
-  
-              if (exerciseStack.isEmpty()) {
-                score = new Score(lesson, exerciseResultList);
-                m_scores.addScore(score);
-  
-                btnNextExercise.setText("Finish");
-              }
-  
-            } else {
-              log.info("Incorrect answer: " + chordName);
-              lblAnswerResult.setForeground(Color.RED);
-              lblAnswerResult.setText("The answer is incorrect. Please try again!");
-              btnNextExercise.setVisible(false);
-  
-              if (!exerciseFailed) {
-                exerciseResultList.add(new ExerciseResult(activeChord, false));
-                exerciseFailed = true;
-              }
+
+          if (chordName.equals(activeChord.getChordName())) {
+            log.info("Answer correct: " + chordName);
+            lblAnswerResult.setForeground(Color.GREEN);
+            lblAnswerResult.setText("The answer is correct!");
+            btnNextExercise.setVisible(true);
+            setEnabledAllbuttons(false);
+            if (!exerciseFailed) {
+              exerciseResultList.add(new ExerciseResult(activeChord, true));
+            }
+
+            if (exerciseStack.isEmpty()) {
+              score = new Score(lesson, exerciseResultList);
+              m_scores.addScore(score);
+
+              btnNextExercise.setText("Finish");
+            }
+
+          } else {
+            log.info("Incorrect answer: " + chordName);
+            lblAnswerResult.setForeground(Color.RED);
+            lblAnswerResult
+                .setText("The answer is incorrect. Please try again!");
+            btnNextExercise.setVisible(false);
+
+            if (!exerciseFailed) {
+              exerciseResultList.add(new ExerciseResult(activeChord, false));
+              exerciseFailed = true;
             }
           }
+
         }
       });
       jpanelAnswerContainer.add(answerButton, "gapleft 10");
@@ -545,6 +534,10 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
           btnNextExercise.doClick();
         }
 
+        if (e.getKeyCode() == KeyEvent.VK_C) {
+          tglClueMode.doClick();
+        }
+        
         if (e.getKeyCode() == KeyEvent.VK_1) {
           if (answerButtonList.size() >= 1) {
             answerButtonList.get(0).doClick();
@@ -604,96 +597,102 @@ public class LessonSSRFrame extends JDialog implements ActionListener {
   }
 
   @Inject
-  private void postConstruct(){
+  private void postConstruct() {
     setToggleButtonsNames();
     checkSamplesAvailability();
   }
 
   private void setToggleButtonsNames() {
     String[] slots = settingsDao.getSlots();
-    
+
     tglSlot1.setText(slots[0]);
     tglSlot2.setText(slots[1]);
     tglSlot3.setText(slots[2]);
     tglSlot4.setText(slots[3]);
     tglSlot5.setText(slots[4]);
   }
-  
-  private void checkSamplesAvailability(){
+
+  private void checkSamplesAvailability() {
     List<Chord> chordList = lesson.getChordSequence();
-    
+
     for (Chord chord : chordList) {
-      if (chord.getFileName() == null){
+      if (chord.getFileName() == null) {
         tglSlot1.setEnabled(false);
       }
-      
-      if (chord.getFileName2() == null){
+
+      if (chord.getFileName2() == null) {
         tglSlot2.setEnabled(false);
       }
-      if (chord.getFileName3() == null){
+      if (chord.getFileName3() == null) {
         tglSlot3.setEnabled(false);
       }
-      if (chord.getFileName4() == null){
+      if (chord.getFileName4() == null) {
         tglSlot4.setEnabled(false);
       }
-      if (chord.getFileName5() == null){
+      if (chord.getFileName5() == null) {
         tglSlot5.setEnabled(false);
       }
     }
-    
-    if (tglSlot1.isEnabled()){
+
+    if (tglSlot1.isEnabled()) {
       tglSlot1.setSelected(true);
-    }else if (tglSlot2.isEnabled()){
+    } else if (tglSlot2.isEnabled()) {
       tglSlot2.setSelected(true);
-    }else if (tglSlot3.isEnabled()){
+    } else if (tglSlot3.isEnabled()) {
       tglSlot3.setSelected(true);
-    }else if (tglSlot4.isEnabled()){
+    } else if (tglSlot4.isEnabled()) {
       tglSlot4.setSelected(true);
-    }else if (tglSlot5.isEnabled()){
+    } else if (tglSlot5.isEnabled()) {
       tglSlot5.setSelected(true);
     }
   }
-  
-  private List<Integer> getSelectedSlots(){
+
+  private List<Integer> getSelectedSlots() {
     List<Integer> selectedSlots = new ArrayList<Integer>();
-    
-    if (tglSlot1.isSelected()){
+
+    if (tglSlot1.isSelected()) {
       selectedSlots.add(0);
     }
-    if (tglSlot2.isSelected()){
+    if (tglSlot2.isSelected()) {
       selectedSlots.add(1);
     }
-    if (tglSlot3.isSelected()){
+    if (tglSlot3.isSelected()) {
       selectedSlots.add(2);
     }
-    if (tglSlot4.isSelected()){
+    if (tglSlot4.isSelected()) {
       selectedSlots.add(3);
     }
-    if (tglSlot5.isSelected()){
+    if (tglSlot5.isSelected()) {
       selectedSlots.add(4);
     }
-    
+
     return selectedSlots;
-    
+
   }
-  
-  private void randomizeSlot(){
-    if (!getSelectedSlots().isEmpty()){
+
+  private void randomizeSlot() {
+    if (!getSelectedSlots().isEmpty()) {
       List<Integer> selectedSlots = getSelectedSlots();
       Collections.shuffle(selectedSlots);
-      slotToPlay = selectedSlots.get(0);    
+      slotToPlay = selectedSlots.get(0);
     }
   }
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-//    Object source = evt.getSource();
-//    
-//    // If any button is pressed select a different slot to play
-//    if (source == tglSlot1 || source == tglSlot2 || source == tglSlot3 ||
-//        source == tglSlot4 || source == tglSlot5){
-//      randomizeSlot();
-//    }
-    
+    // Object source = evt.getSource();
+    //
+    // // If any button is pressed select a different slot to play
+    // if (source == tglSlot1 || source == tglSlot2 || source == tglSlot3 ||
+    // source == tglSlot4 || source == tglSlot5){
+    // randomizeSlot();
+    // }
+
+  }
+
+  @Override
+  public void clueClosed() {
+    tglClueMode.setSelected(false);
+
   }
 }

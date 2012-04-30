@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -38,6 +39,7 @@ import net.miginfocom.swing.MigLayout;
 
 import org.apache.log4j.Logger;
 
+import ro.btanase.chordlearning.ChordLearningApp;
 import ro.btanase.chordlearning.dao.ScoreDao;
 import ro.btanase.chordlearning.dao.SettingsDao;
 import ro.btanase.chordlearning.domain.Chord;
@@ -53,9 +55,8 @@ import ro.btanase.utils.Searchable;
 import ca.odell.glazedlists.BasicEventList;
 
 import com.google.inject.Inject;
-import java.awt.Toolkit;
 
-public class LessonCPRFrame extends JDialog implements ActionListener {
+public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
   private JTextField tfLessonName;
   private JTextField tfProgress;
   private Lesson lesson;
@@ -103,7 +104,6 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   private JToggleButton tglSlot5;
   private JPanel panel_4;
   private JToggleButton tglClueMode;
-  private JLabel lblClueMode;
   private Map<JComponent, Boolean> componentMap;
   private Map<JToggleButton, Boolean> toggleButtonsSelectionStatus;
   private List<Integer> lastSelectedSlots = new ArrayList<Integer>();
@@ -111,6 +111,8 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   @Inject
   protected MediaPlayer mediaPlayer;
 
+  private ClueDialog clueDialog;
+  
   /**
    * Create the dialog.
    */
@@ -129,8 +131,8 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     setModal(true);
     this.lesson = lesson;
     setTitle("Chord Progression Recognition");
-    setBounds(100, 100, 774, 413);
-    getContentPane().setLayout(new MigLayout("", "[][grow][][grow]", "[][][][100][118.00,grow]"));
+    setBounds(100, 100, 774, 430);
+    getContentPane().setLayout(new MigLayout("", "[][grow][][grow]", "[][][100][118.00,grow]"));
 
     panel_3 = new JPanel();
     panel_3.setForeground(new Color(255, 255, 255));
@@ -185,6 +187,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     tfProgress.setEditable(false);
 
     tglClueMode = new JToggleButton("Clue Mode");
+    tglClueMode.setMnemonic('c');
     tglClueMode.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         disableAllControls(tglClueMode.isSelected());
@@ -217,13 +220,8 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
       }
     });
 
-    lblClueMode = new JLabel("You are now in \"Clue\" Mode. Press each chord name to listen to it!");
-    lblClueMode.setFont(new Font("Tahoma", Font.PLAIN, 16));
-    lblClueMode.setForeground(new Color(255, 131, 0));
-    getContentPane().add(lblClueMode, "cell 0 2 4 1,alignx center");
-
     scrollPane_1 = new JScrollPane();
-    getContentPane().add(scrollPane_1, "cell 0 3 4 1,grow");
+    getContentPane().add(scrollPane_1, "cell 0 2 4 1,grow");
 
     panel_2 = new JPanel();
     panel_2.setBackground(BK_COLOR);
@@ -241,18 +239,18 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     scrollPane = new JScrollPane();
     // scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
     scrollPane.setBorder(BorderFactory.createEmptyBorder());
-    getContentPane().add(scrollPane, "cell 0 4 4 1,grow");
+    getContentPane().add(scrollPane, "cell 0 3 4 1,grow");
 
     JPanel panel = new JPanel();
     panel.setBackground(BK_COLOR);
     scrollPane.setViewportView(panel);
     panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Choose Answer",
         TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
-    panel.setLayout(new MigLayout("", "[][grow][]", "[grow][25px:25px:25px]"));
+    panel.setLayout(new MigLayout("", "[][grow][]", "[92.00,grow][25px:25px:25px]"));
 
     jpanelAnswerContainer = new JPanel();
     jpanelAnswerContainer.setBackground(BK_COLOR);
-    panel.add(jpanelAnswerContainer, "cell 1 0 2 1,alignx center,aligny center");
+    panel.add(jpanelAnswerContainer, "cell 0 0 3 1,alignx center,aligny center");
     jpanelAnswerContainer.setLayout(new MigLayout("wrap 8", "[]", "[]"));
 
     lblAnswerResult = new JLabel("");
@@ -272,9 +270,6 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
     manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
     dispatcher = new MyDispatcher();
     manager.addKeyEventDispatcher(dispatcher);
-
-    // save component list
-    lblClueMode.setVisible(false);
     componentMap = new HashMap<JComponent, Boolean>();
     componentMap.put(btnNextExercise, btnNextExercise.isEnabled());
     componentMap.put(btnPlay, btnPlay.isEnabled());
@@ -415,29 +410,6 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
           String chordName = e.getActionCommand();
-          if (tglClueMode.isSelected()){
-            List<Integer> slotList = getSelectedSlots();
-            Collections.shuffle(slotList);
-            
-            mediaPlayer.stopPlayback();
-            mediaPlayer.playImaFile(ReflectionUtils.invokeChordGetFileName(chord, slotList.get(0)), new IMPCallback() {
-              
-              @Override
-              public void onStop() {
-                // TODO Auto-generated method stub
-                
-              }
-              
-              @Override
-              public void onPlay() {
-                // TODO Auto-generated method stub
-                
-              }
-            });
-            
-            // exit method when done
-            return;
-          }  
           
           Chord pressedChord = ListUtils.findInList(chordSequence, chordName, new Searchable<Chord, String>() {
 
@@ -600,6 +572,10 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
           btnNextExercise.doClick();
         }
 
+        if (e.getKeyCode() == KeyEvent.VK_C) {
+          tglClueMode.doClick();
+        }
+
         if (e.getKeyCode() == KeyEvent.VK_1) {
           if (answerButtonList.size() >= 1) {
             answerButtonList.get(0).doClick();
@@ -745,37 +721,53 @@ public class LessonCPRFrame extends JDialog implements ActionListener {
   }
 
   protected void disableAllControls(boolean selected) {
-    Set<JComponent> keys = componentMap.keySet();
-    Set<JToggleButton> toggleKeys = toggleButtonsSelectionStatus.keySet();
-
-    if (selected == true) {
-      // tglClueMode.setBackground(Color.RED);
-      // save existing state
-      for (JComponent jComponent : keys) {
-        componentMap.put(jComponent, jComponent.isEnabled());
-      }
-      
-      for (JToggleButton jToggleButton : toggleKeys) {
-        toggleButtonsSelectionStatus.put(jToggleButton, jToggleButton.isSelected());
-      }
-      
-      // disable all controls
-      for (JComponent jComponent : keys) {
-        jComponent.setEnabled(false);
-      }
-      lblClueMode.setVisible(true);
+    if (selected) {
+      clueDialog = new ClueDialog(this, lesson);
+      ChordLearningApp.getInjector().injectMembers(clueDialog);
+      clueDialog.setVisible(true);
     } else {
-      for (JComponent jComponent : keys) {
-        jComponent.setEnabled(componentMap.get(jComponent));
+      if (clueDialog != null) {
+        clueDialog.dispose();
       }
-      lblClueMode.setVisible(false);
-
-      for (JToggleButton jToggleButton : toggleKeys) {
-        jToggleButton.setSelected(toggleButtonsSelectionStatus.get(jToggleButton));
-      }
-      
     }
 
+    
+//    Set<JComponent> keys = componentMap.keySet();
+//    Set<JToggleButton> toggleKeys = toggleButtonsSelectionStatus.keySet();
+//
+//    if (selected == true) {
+//      // tglClueMode.setBackground(Color.RED);
+//      // save existing state
+//      for (JComponent jComponent : keys) {
+//        componentMap.put(jComponent, jComponent.isEnabled());
+//      }
+//      
+//      for (JToggleButton jToggleButton : toggleKeys) {
+//        toggleButtonsSelectionStatus.put(jToggleButton, jToggleButton.isSelected());
+//      }
+//      
+//      // disable all controls
+//      for (JComponent jComponent : keys) {
+//        jComponent.setEnabled(false);
+//      }
+//      lblClueMode.setVisible(true);
+//    } else {
+//      for (JComponent jComponent : keys) {
+//        jComponent.setEnabled(componentMap.get(jComponent));
+//      }
+//      lblClueMode.setVisible(false);
+//
+//      for (JToggleButton jToggleButton : toggleKeys) {
+//        jToggleButton.setSelected(toggleButtonsSelectionStatus.get(jToggleButton));
+//      }
+//      
+//    }
+
+  }
+
+  @Override
+  public void clueClosed() {
+    tglClueMode.setSelected(false);
   }
 
 }

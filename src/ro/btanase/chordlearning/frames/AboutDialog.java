@@ -57,7 +57,7 @@ public class AboutDialog extends JDialog {
         scrollPane.setViewportView(txtpnguitarChordEar);
         txtpnguitarChordEar.setContentType("text/html");
         txtpnguitarChordEar.setEditable(false);
-        txtpnguitarChordEar.setText("<h3>Train My Ear</h3>\r\n\r\nCopyright: Bogdan Tanase 2011 \r\n <br> Contact: bftanase@gmail.com <br/>Version: 1.0.0 freeware \r\n <br/><p> </p> Thanks to: <br/>LBro - for providing the chord samples and valuable feedback <br/>and to all the wonderful people from the Java open source community!");
+        txtpnguitarChordEar.setText("<h3>Train My Ear</h3>\r\n\r\nCopyright: Bogdan Tanase 2012 \r\n <br> Contact: bftanase@gmail.com <br/>Version: " + ChordLearningApp.VERSION + " freeware \r\n <br/><p> </p> Thanks to: <br/>LBro - for providing the chord samples and valuable feedback <br/>and to all the wonderful people from the Java open source community!");
       }
     }
     {
