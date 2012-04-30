@@ -42,7 +42,7 @@ public class AboutDialog extends JDialog {
     setIconImage(Toolkit.getDefaultToolkit().getImage(AboutDialog.class.getResource("/res/tme_small.png")));
     setModal(true);
     setTitle("About Train My Ear");
-    setBounds(100, 100, 460, 319);
+    setBounds(100, 100, 460, 357);
     getContentPane().setLayout(new BorderLayout());
     getContentPane().setBackground(BK_COLOR);
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -57,7 +57,14 @@ public class AboutDialog extends JDialog {
         scrollPane.setViewportView(txtpnguitarChordEar);
         txtpnguitarChordEar.setContentType("text/html");
         txtpnguitarChordEar.setEditable(false);
-        txtpnguitarChordEar.setText("<h3>Train My Ear</h3>\r\n\r\nCopyright: Bogdan Tanase 2012 \r\n <br> Contact: bftanase@gmail.com <br/>Version: " + ChordLearningApp.VERSION + " freeware \r\n <br/><p> </p> Thanks to: <br/>LBro - for providing the chord samples and valuable feedback <br/>and to all the wonderful people from the Java open source community!");
+        txtpnguitarChordEar.setText("<h3>Train My Ear</h3>\r\n\r\nCopyright: Bogdan Tanase 2012 \r\n <br>" +
+        		" Contact: bftanase@gmail.com <br/>" +
+        		"Version: " + ChordLearningApp.VERSION + " freeware \r\n <br/>" +
+        				"<p> </p> Thanks to: <br/>" +
+        				"LBro - for providing the chord samples and valuable feedback <br/>" +
+        				"Bhaz - for providing the electric samples <br/>" +
+        				"Matan - great feedback!<br/>" +
+        				"and to all the wonderful people from the Java open source community!");
       }
     }
     {
