@@ -116,6 +116,7 @@ public class LessonSSRFrame extends JDialog implements ActionListener, IClue {
     addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(WindowEvent e) {
+        log.debug("window closing: removing keyEventDispatcher");
         manager.removeKeyEventDispatcher(dispatcher);
       }
     });

@@ -40,12 +40,7 @@ public class TestResultFrame extends JDialog {
    */
   public TestResultFrame(final LessonSSRFrame ltf, Score score) {
     setIconImage(Toolkit.getDefaultToolkit().getImage(TestResultFrame.class.getResource("/res/tme_small.png")));
-    addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(WindowEvent e) {
-        ltf.dispose();
-      }
-    });
+
     contentPanel.setBackground(BK_COLOR);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setModal(true);
@@ -144,7 +139,11 @@ public class TestResultFrame extends JDialog {
 
 
   private void onBackToLessonActionPerformed() {
-    ltf.dispose();
+    // REMEMBER: frame.dispose() does NOT trigger WINDOW_CLOSING events
+    // we need to send them manually
+    WindowEvent closingEvent = new WindowEvent(ltf, WindowEvent.WINDOW_CLOSING);
+    ltf.dispatchEvent(closingEvent);
+
     this.dispose();
     
   }
