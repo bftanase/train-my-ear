@@ -286,6 +286,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
 
   private void onBtnStopActionPerformed() {
     sequencePlayer.stop();
+    mediaPlayer.stopPlayback();
 
   }
 

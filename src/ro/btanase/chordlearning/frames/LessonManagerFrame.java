@@ -115,7 +115,7 @@ public class LessonManagerFrame extends JDialog {
     contentPane.add(btnCopyLesson, "cell 1 6,growx");
     contentPane.add(btnMoveUp, "cell 1 8,growx");
 
-    btnMovedown = new JButton("MoveDown");
+    btnMovedown = new JButton("Move Down");
     btnMovedown.setMnemonic('d');
     btnMovedown.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

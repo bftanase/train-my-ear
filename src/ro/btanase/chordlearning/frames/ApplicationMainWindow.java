@@ -161,7 +161,7 @@ public class ApplicationMainWindow extends JFrame {
     menuItemHelp.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         try{
-          URI uri = new URI("http://chords.btanase.ro/index.php/page/documentation");
+          URI uri = new URI("http://chords.btanase.ro/documentation");
           Desktop.getDesktop().browse(uri);
         }catch(Exception ex){
           log.error("Can't launch user browser ", ex);
