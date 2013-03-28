@@ -115,6 +115,7 @@ public class TestResultFrame extends JDialog {
       buttonPane.setLayout(new MigLayout("", "[][65px,grow]", "[23px]"));
       {
         JButton btnRestart = new JButton("Restart");
+        btnRestart.setMnemonic('r');
         btnRestart.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             onBtnRestartActionPerformed();
@@ -124,6 +125,7 @@ public class TestResultFrame extends JDialog {
       }
       {
         JButton btnBackToLesson = new JButton("Back to lesson index");
+        btnBackToLesson.setMnemonic('i');
         btnBackToLesson.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             onBackToLessonActionPerformed();

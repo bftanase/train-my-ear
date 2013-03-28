@@ -22,7 +22,7 @@ public class ChordLearningApp {
   private static Injector injector;
 //  public static final double CONFIG_FILE_CHORDS_VERSION = 1.0;
 //  public static final double CONFIG_FILE_LESSON_VERSION = 1.1;
-  public static final String VERSION = "1.1.4";
+  public static final String VERSION = "1.1.6";
   public static final String CONFIG_FOLDER = "config";
   
   /**
@@ -31,6 +31,22 @@ public class ChordLearningApp {
    */
   public static void main(String[] args) {
 
+    String os = System.getProperty("os.name");
+
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//      if (os.matches("Linux")) {
+//        // In some versions of Sun JDK the "Metal" look and feel crashes with a ClassCastException
+//        // let's force the GTK+ LookAndFeel
+//       // UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+//      } else {
+//      }
+    } catch (Throwable e) {
+      log.error("unable to set look and feel", e);
+      throw new RuntimeException(e);
+    }
+
+    
     MyUncaughtExceptionHandler.registerExceptionHandler();
     
     if (args.length == 1 && args[0].equals("-c")){
@@ -46,12 +62,6 @@ public class ChordLearningApp {
       
       @Override
       public void run() {
-        try {
-          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Throwable e) {
-          log.error("unable to set look and feel", e);
-          throw new RuntimeException(e);
-        }
 
         injector = Guice.createInjector(new ChordLearningModule());
         initUserData();

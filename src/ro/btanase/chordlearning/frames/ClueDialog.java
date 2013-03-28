@@ -70,6 +70,7 @@ public class ClueDialog extends JDialog {
   @Inject
   public ClueDialog(final JDialog dialog, Lesson lesson) {
     super(dialog);
+    setModal(false);
     this.parent = dialog;
     this.lesson = lesson;
     setTitle("Play samples");

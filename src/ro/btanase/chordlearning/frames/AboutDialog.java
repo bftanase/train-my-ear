@@ -16,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 import ro.btanase.chordlearning.ChordLearningApp;
 import java.awt.Toolkit;
+import javax.swing.UIManager;
 
 public class AboutDialog extends JDialog {
 
@@ -26,6 +27,11 @@ public class AboutDialog extends JDialog {
    * Launch the application.
    */
   public static void main(String[] args) {
+    try {
+      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
     try {
       AboutDialog dialog = new AboutDialog();
       dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

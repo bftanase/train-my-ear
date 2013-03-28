@@ -124,7 +124,7 @@ public class LessonSSRFrame extends JDialog implements ActionListener, IClue {
     setModal(true);
     this.lesson = lesson;
     setTitle("Single Sound Recognition");
-    setBounds(100, 100, 774, 351);
+    setBounds(100, 100, 900, 500);
     getContentPane().setLayout(
         new MigLayout("", "[][grow][grow][]", "[][][][grow]"));
 

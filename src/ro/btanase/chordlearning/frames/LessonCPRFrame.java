@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -55,6 +56,7 @@ import ro.btanase.utils.Searchable;
 import ca.odell.glazedlists.BasicEventList;
 
 import com.google.inject.Inject;
+import javax.swing.JProgressBar;
 
 public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
   private JTextField tfLessonName;
@@ -112,11 +114,13 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
   protected MediaPlayer mediaPlayer;
 
   private ClueDialog clueDialog;
+  private JProgressBar progressBar;
   
   /**
    * Create the dialog.
    */
   public LessonCPRFrame(Lesson lesson) {
+    setModal(true);
     setIconImage(Toolkit.getDefaultToolkit().getImage(LessonCPRFrame.class.getResource("/res/tme_small.png")));
     getContentPane().setBackground(BK_COLOR);
     addWindowListener(new WindowAdapter() {
@@ -128,11 +132,10 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
       }
     });
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    setModal(true);
     this.lesson = lesson;
     setTitle("Chord Progression Recognition");
-    setBounds(100, 100, 774, 430);
-    getContentPane().setLayout(new MigLayout("", "[][grow][][grow]", "[][][100][118.00,grow]"));
+    setBounds(100, 100, 900, 500);
+    getContentPane().setLayout(new MigLayout("", "[][grow][][grow]", "[][][100px:n][118.00,grow]"));
 
     panel_3 = new JPanel();
     panel_3.setForeground(new Color(255, 255, 255));
@@ -198,11 +201,11 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
     panel_1 = new JPanel();
     panel_1.setBackground(BK_COLOR);
     getContentPane().add(panel_1, "cell 0 1 4 1,grow");
-    panel_1.setLayout(new MigLayout("", "[58px,grow][grow]", "[26px]"));
+    panel_1.setLayout(new MigLayout("", "[58px,grow][grow]", "[26px][20px:n]"));
 
     btnPlay = new JButton("Play");
     btnPlay.setMnemonic('p');
-    panel_1.add(btnPlay, "cell 0 0,alignx right,aligny top");
+    panel_1.add(btnPlay, "flowy,cell 0 0,alignx right,aligny top");
 
     btnStop = new JButton("Stop");
     btnStop.setMnemonic('s');
@@ -211,7 +214,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
         onBtnStopActionPerformed();
       }
     });
-    panel_1.add(btnStop, "cell 1 0,aligny top");
+    panel_1.add(btnStop, "flowx,cell 1 0,aligny top");
     btnPlay.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
 
@@ -229,7 +232,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
     scrollPane_1.setBorder(BorderFactory.createEmptyBorder());
     panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Your answer:",
         TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
-    panel_2.setLayout(new MigLayout("", "[grow]", "[55,center]"));
+    panel_2.setLayout(new MigLayout("", "[grow]", "[50:n,center]"));
 
     jpanelResult = new JPanel();
     jpanelResult.setBackground(BK_COLOR);
@@ -275,6 +278,12 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
     componentMap.put(btnPlay, btnPlay.isEnabled());
     componentMap.put(btnStop, btnStop.isEnabled());
     
+    progressBar = new JProgressBar();
+    progressBar.setIndeterminate(true);
+    progressBar.setVisible(false);
+    
+    panel_1.add(progressBar, "cell 0 1 2 1,alignx center");
+    
     toggleButtonsSelectionStatus = new HashMap<JToggleButton, Boolean>();
     toggleButtonsSelectionStatus.put(tglSlot1, tglSlot1.isSelected());
     toggleButtonsSelectionStatus.put(tglSlot2, tglSlot2.isSelected());
@@ -309,10 +318,32 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
     }
     
     if (sequencePlayer.getPlayList() != playList) {
-      sequencePlayer.setPlayList(playList, lesson.getChordDelay());
+      SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+
+        @Override
+        protected Void doInBackground() throws Exception {
+          sequencePlayer.setPlayList(playList, lesson.getChordDelay());
+          return null;
+        }
+
+        @Override
+        protected void done() {
+          progressBar.setVisible(false);
+          btnPlay.setEnabled(true);
+          btnStop.setEnabled(true);
+          sequencePlayer.play();
+        }
+        
+      };
+      
+      progressBar.setVisible(true);
+      btnPlay.setEnabled(false);
+      btnStop.setEnabled(false);
+      worker.execute();
+    } else {
+      sequencePlayer.play();
     }
 
-    sequencePlayer.play();
 
   }
 

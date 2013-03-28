@@ -18,6 +18,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer.Info;
 
 import org.apache.log4j.Logger;
 
@@ -47,7 +48,9 @@ public class SequencePlayer {
     
     this.playList = playList;
     audioBufferList.clear();
-    clip.close();
+    if (clip.isOpen()) {
+      clip.close();
+    }
 
     WaveSoundMixer wsm = new WaveSoundMixer();
     
@@ -147,7 +150,22 @@ public class SequencePlayer {
 
   public SequencePlayer() {
     try {
-      clip = AudioSystem.getClip();
+      // in OpenJDK the default clip obtained by AudioSystem.getClip() does not support our needed format
+      // why? I have no idea. "default" seem to work fine on some tests
+      Info[] mixers = AudioSystem.getMixerInfo();
+      Info defaultMixer = null;
+      for (Info info : mixers) {
+        if (info.getName().equals("default [default]")) {
+          defaultMixer = info;
+          break;
+        }
+        log.debug("!!!! mixer: " + info.getName());
+      }
+      
+      clip = AudioSystem.getClip(defaultMixer);
+      
+      log.debug("!!!!!!!!!!!!! format: " + clip.getFormat());      
+//      clip = AudioSystem.getClip();
     } catch (LineUnavailableException e) {
       throw new RuntimeException(e);
     }
