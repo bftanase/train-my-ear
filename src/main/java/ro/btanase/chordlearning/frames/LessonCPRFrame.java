@@ -341,6 +341,7 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
       btnStop.setEnabled(false);
       worker.execute();
     } else {
+      sequencePlayer.stop();
       sequencePlayer.play();
     }
 
@@ -503,7 +504,11 @@ public class LessonCPRFrame extends JDialog implements ActionListener, IClue {
                   restart();
                   return;
                 } else {
-                  LessonCPRFrame.this.dispose();
+                  // REMEMBER: frame.dispose() does NOT trigger WINDOW_CLOSING events
+                  // we need to send them manually
+                  WindowEvent closingEvent = new WindowEvent(LessonCPRFrame.this, WindowEvent.WINDOW_CLOSING);
+                  LessonCPRFrame.this.dispatchEvent(closingEvent);
+                  
                   return;
                 }
               }
