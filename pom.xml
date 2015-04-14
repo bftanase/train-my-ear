@@ -4,7 +4,7 @@
 
     <groupId>ro.btanase.trainmyear</groupId>
     <artifactId>train-my-ear</artifactId>
-    <version>1.1.7</version>
+    <version>1.1.9</version>
     <packaging>jar</packaging>
 
     <name>Train My Ear</name>
@@ -21,11 +21,11 @@
             <artifactId>miglayout</artifactId>
             <version>3.7.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
-        </dependency>
+				<dependency>
+				  <groupId>commons-io</groupId>
+				  <artifactId>commons-io</artifactId>
+				  <version>2.4</version>
+				</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -66,6 +66,12 @@
             <artifactId>guice</artifactId>
             <version>3.0</version>
         </dependency>
+				<dependency>
+				  <groupId>commons-codec</groupId>
+				  <artifactId>commons-codec</artifactId>
+				  <version>1.10</version>
+				</dependency>
+        
     </dependencies>
     <build>
         <plugins>
@@ -123,7 +129,7 @@
                             <outputDirectory>${basedir}/target/preset_data</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${presetData}</directory>
+                                    <directory>preset_data</directory>
                                 </resource>
                             </resources>
                         </configuration>

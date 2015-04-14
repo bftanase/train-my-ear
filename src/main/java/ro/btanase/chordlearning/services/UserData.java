@@ -56,4 +56,9 @@ public interface UserData {
    * Examines the DB Schema and upgrades it if necessary to the latest version
    */
   public void upgradeIfNecessary();
+
+  /**
+   * Invert the incorrect chords definitions in version 1.1.7
+   */
+  void fixInvertedEChords();
 }

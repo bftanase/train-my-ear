@@ -283,41 +283,6 @@ public class LessonSSRFrame extends JDialog implements ActionListener, IClue {
         clueDialog.dispose();
       }
     }
-    //
-    // Set<JComponent> keys = componentMap.keySet();
-    // Set<JToggleButton> toggleKeys = toggleButtonsSelectionStatus.keySet();
-    //
-    // if (selected == true){
-    // // tglClueMode.setBackground(Color.RED);
-    // // save existing state
-    // for (JComponent jComponent : keys) {
-    // componentMap.put(jComponent, jComponent.isEnabled());
-    // }
-    //
-    // for (JToggleButton jToggleButton : toggleKeys) {
-    // toggleButtonsSelectionStatus.put(jToggleButton,
-    // jToggleButton.isSelected());
-    // }
-    //
-    //
-    // // disable all controls
-    // for (JComponent jComponent : keys) {
-    // jComponent.setEnabled(false);
-    // }
-    // lblClueMode.setVisible(true);
-    // } else {
-    // for (JComponent jComponent : keys) {
-    // jComponent.setEnabled(componentMap.get(jComponent));
-    // }
-    // lblClueMode.setVisible(false);
-    //
-    // for (JToggleButton jToggleButton : toggleKeys) {
-    // jToggleButton.setSelected(toggleButtonsSelectionStatus.get(jToggleButton));
-    // }
-    //
-    //
-    // }
-
   }
 
   private void onBtnStopActionPerformed() {
@@ -339,23 +304,6 @@ public class LessonSSRFrame extends JDialog implements ActionListener, IClue {
   }
 
   private void onBtnPlayActionPerformed() {
-    // if (btnPlay.getText().startsWith("Play")) {
-    // mediaPlayer.playImaFile(activeChord.getFileName(), new IMPCallback() {
-    //
-    // @Override
-    // public void onStop() {
-    // btnPlay.setText("Play");
-    // }
-    //
-    // @Override
-    // public void onPlay() {
-    // btnPlay.setText("Stop");
-    // }
-    // });
-    // } else {
-    // mediaPlayer.stopPlayback();
-    // }
-
     List<Integer> selectedSlots = getSelectedSlots();
 
     if (!getSelectedSlots().equals(lastSelectedSlots)) {

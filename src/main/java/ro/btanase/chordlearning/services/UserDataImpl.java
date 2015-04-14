@@ -2,6 +2,7 @@ package ro.btanase.chordlearning.services;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -20,6 +22,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class UserDataImpl implements UserData {
   private String userFolder;
+  
+  // wrong chords identification
+  private final String E_CHORD_MD5 = "0b970f2846cc5fed25df48bc6bca8826";
+  private final String EM_CHORD_MD5 = "b69cb7b39ff48f79cd7ba36d25801af6";
 
   private static Logger log = Logger.getLogger(UserDataImpl.class);
   
@@ -217,6 +223,60 @@ public class UserDataImpl implements UserData {
     
   }
   
-  
+  @Override
+	public void fixInvertedEChords() {
+		try {
+			Connection con = jdbcProvider.get().getCon();
+
+			PreparedStatement stmt = con
+					.prepareStatement("SELECT C_FILENAME FROM CHORD WHERE C_NAME='E'");
+
+			ResultSet rs = stmt.executeQuery();
+
+			if (!rs.next()) {
+			  return;
+			}
+			String eChordFilename = rs.getString(1);
+
+			stmt = con.prepareStatement("SELECT C_FILENAME FROM CHORD WHERE C_NAME='Em'");
+
+      rs = stmt.executeQuery();
+
+      if (!rs.next()) {
+        return;
+      }
+			
+      String emChordFilename = rs.getString(1);
+			
+			// compare the md5 checksums of the E and Em files with the ones that are know to be wrong
+			String eChordFilepath = this.getMediaFolder() + File.separator + eChordFilename;
+			
+			FileInputStream fis = new FileInputStream(eChordFilepath);
+			String eChordMd5 = DigestUtils.md5Hex(fis);
+			fis.close();
+			
+      String emChordFilepath = this.getMediaFolder() + File.separator + emChordFilename;
+      fis = new FileInputStream(emChordFilepath);
+      String emChordMd5 = DigestUtils.md5Hex(fis);
+      fis.close();
+			
+			if (eChordMd5.equals(E_CHORD_MD5) && emChordMd5.equals(EM_CHORD_MD5)){
+			  File ef = new File(eChordFilepath);
+			  File tmp = new File(this.getMediaFolder() + File.separator + "tmp");
+			  
+			  FileUtils.moveFile(ef, tmp);
+			  
+			  File emf = new File(emChordFilepath);
+			  FileUtils.moveFile(emf, ef);
+			  FileUtils.moveFile(tmp, emf);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+		  throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+	}
   
 }

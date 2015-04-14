@@ -63,12 +63,7 @@
 	<select id="selectChordAccuracy" resultType="ChordAccuracyWrapper">
 		SELECT 
 		  c_name as chordName,
-		  (SELECT 
-		    COUNT(*) 
-		  FROM
-		    exercise_score es 
-		  WHERE es.c_id = exercise_score.c_id 
-		    AND es.correct = TRUE) AS correctCount,
+      COUNT(NULLIF(correct, false)) AS correctCount,
 		  COUNT(correct) AS totalCount 
 		FROM
 		  exercise_score 
